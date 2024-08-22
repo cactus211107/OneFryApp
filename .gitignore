@@ -1,0 +1,7 @@
+.venv
+usercontent
+.html
+.hintrc
+*__pycache__*
+*.key
+.DS_Store

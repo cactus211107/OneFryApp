@@ -1,0 +1,4 @@
+flask
+requests
+pillow
+pillow-heif

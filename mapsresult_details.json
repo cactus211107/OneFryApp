@@ -1,0 +1,385 @@
+{
+    "html_attributions": [],
+    "result": {
+        "address_components": [
+            {
+                "long_name": "48",
+                "short_name": "48",
+                "types": [
+                    "street_number"
+                ]
+            },
+            {
+                "long_name": "Pirrama Road",
+                "short_name": "Pirrama Rd",
+                "types": [
+                    "route"
+                ]
+            },
+            {
+                "long_name": "Pyrmont",
+                "short_name": "Pyrmont",
+                "types": [
+                    "locality",
+                    "political"
+                ]
+            },
+            {
+                "long_name": "Council of the City of Sydney",
+                "short_name": "Sydney",
+                "types": [
+                    "administrative_area_level_2",
+                    "political"
+                ]
+            },
+            {
+                "long_name": "New South Wales",
+                "short_name": "NSW",
+                "types": [
+                    "administrative_area_level_1",
+                    "political"
+                ]
+            },
+            {
+                "long_name": "Australia",
+                "short_name": "AU",
+                "types": [
+                    "country",
+                    "political"
+                ]
+            },
+            {
+                "long_name": "2009",
+                "short_name": "2009",
+                "types": [
+                    "postal_code"
+                ]
+            }
+        ],
+        "adr_address": "<span class=\"street-address\">48 Pirrama Rd</span>, <span class=\"locality\">Pyrmont</span> <span class=\"region\">NSW</span> <span class=\"postal-code\">2009</span>, <span class=\"country-name\">Australia</span>",
+        "business_status": "OPERATIONAL",
+        "current_opening_hours": {
+            "open_now": false,
+            "periods": [
+                {
+                    "close": {
+                        "date": "2024-08-26",
+                        "day": 1,
+                        "time": "1730"
+                    },
+                    "open": {
+                        "date": "2024-08-26",
+                        "day": 1,
+                        "time": "0830"
+                    }
+                },
+                {
+                    "close": {
+                        "date": "2024-08-27",
+                        "day": 2,
+                        "time": "1730"
+                    },
+                    "open": {
+                        "date": "2024-08-27",
+                        "day": 2,
+                        "time": "0830"
+                    }
+                },
+                {
+                    "close": {
+                        "date": "2024-08-21",
+                        "day": 3,
+                        "time": "1730"
+                    },
+                    "open": {
+                        "date": "2024-08-21",
+                        "day": 3,
+                        "time": "0830"
+                    }
+                },
+                {
+                    "close": {
+                        "date": "2024-08-22",
+                        "day": 4,
+                        "time": "1700"
+                    },
+                    "open": {
+                        "date": "2024-08-22",
+                        "day": 4,
+                        "time": "0830"
+                    }
+                },
+                {
+                    "close": {
+                        "date": "2024-08-23",
+                        "day": 5,
+                        "time": "1700"
+                    },
+                    "open": {
+                        "date": "2024-08-23",
+                        "day": 5,
+                        "time": "0830"
+                    }
+                }
+            ],
+            "weekday_text": [
+                "Monday: 8:30\u202fAM\u2009\u2013\u20095:30\u202fPM",
+                "Tuesday: 8:30\u202fAM\u2009\u2013\u20095:30\u202fPM",
+                "Wednesday: 8:30\u202fAM\u2009\u2013\u20095:30\u202fPM",
+                "Thursday: 8:30\u202fAM\u2009\u2013\u20095:00\u202fPM",
+                "Friday: 8:30\u202fAM\u2009\u2013\u20095:00\u202fPM",
+                "Saturday: Closed",
+                "Sunday: Closed"
+            ]
+        },
+        "formatted_address": "48 Pirrama Rd, Pyrmont NSW 2009, Australia",
+        "formatted_phone_number": "(02) 9374 4000",
+        "geometry": {
+            "location": {
+                "lat": -33.866489,
+                "lng": 151.1958561
+            },
+            "viewport": {
+                "northeast": {
+                    "lat": -33.8655112697085,
+                    "lng": 151.1971156302915
+                },
+                "southwest": {
+                    "lat": -33.86820923029149,
+                    "lng": 151.1944176697085
+                }
+            }
+        },
+        "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/generic_business-71.png",
+        "icon_background_color": "#7B9EB0",
+        "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet",
+        "international_phone_number": "+61 2 9374 4000",
+        "name": "Google Sydney - Pirrama Road",
+        "opening_hours": {
+            "open_now": false,
+            "periods": [
+                {
+                    "close": {
+                        "day": 1,
+                        "time": "1730"
+                    },
+                    "open": {
+                        "day": 1,
+                        "time": "0830"
+                    }
+                },
+                {
+                    "close": {
+                        "day": 2,
+                        "time": "1730"
+                    },
+                    "open": {
+                        "day": 2,
+                        "time": "0830"
+                    }
+                },
+                {
+                    "close": {
+                        "day": 3,
+                        "time": "1730"
+                    },
+                    "open": {
+                        "day": 3,
+                        "time": "0830"
+                    }
+                },
+                {
+                    "close": {
+                        "day": 4,
+                        "time": "1700"
+                    },
+                    "open": {
+                        "day": 4,
+                        "time": "0830"
+                    }
+                },
+                {
+                    "close": {
+                        "day": 5,
+                        "time": "1700"
+                    },
+                    "open": {
+                        "day": 5,
+                        "time": "0830"
+                    }
+                }
+            ],
+            "weekday_text": [
+                "Monday: 8:30\u202fAM\u2009\u2013\u20095:30\u202fPM",
+                "Tuesday: 8:30\u202fAM\u2009\u2013\u20095:30\u202fPM",
+                "Wednesday: 8:30\u202fAM\u2009\u2013\u20095:30\u202fPM",
+                "Thursday: 8:30\u202fAM\u2009\u2013\u20095:00\u202fPM",
+                "Friday: 8:30\u202fAM\u2009\u2013\u20095:00\u202fPM",
+                "Saturday: Closed",
+                "Sunday: Closed"
+            ]
+        },
+        "photos": [
+            {
+                "height": 3024,
+                "html_attributions": [
+                    "<a href=\"https://maps.google.com/maps/contrib/104641095422852249098\">Matt B</a>"
+                ],
+                "photo_reference": "AelY_CscXHuk3RGHQJ8ygfUC79kqYmGMvharwDYQ6SVJZ9o6sILJy1-t1zpaSOSmDYgozthDQY3rHenrNbnHtQKoMa9L61tkN8SdQFi98TfEsHQ5_Gexf769t_EslJde8PkY9GA5ODpCfSjDUdLVUSaV41yMQhdsaV3I775QOsU1D3fDYK4i",
+                "width": 4032
+            },
+            {
+                "height": 3264,
+                "html_attributions": [
+                    "<a href=\"https://maps.google.com/maps/contrib/102493344958625549078\">Heyang Li</a>"
+                ],
+                "photo_reference": "AelY_CuzPdSCjR4b8ugsAfpmEQKeaVtRVFmraC4Z3AmeeUqQzloYGRBJB1E2z0w7vVv-J5o2dV8TryaRTAZ8SiwFt9Gu-GZD_EMA_ai-lg9cco5qHafuXNsu6NNIjb2zEZ2kf-KEtg46rLvoyB8ADCzq6eaAOFTW7DH4FSsbrWhYUT8tqj-a",
+                "width": 4912
+            },
+            {
+                "height": 3024,
+                "html_attributions": [
+                    "<a href=\"https://maps.google.com/maps/contrib/109073253434498369454\">sang suh</a>"
+                ],
+                "photo_reference": "AelY_CufPMEF1Cz91n2osJb0-M5IAJftlEkFqTddsORvh9CenXmexvaziiNRrbXXJYubYRnwlL48ClRoyLwmRTg10w9jKIP8s-9BAVvDJj4Ss6uKR5WECTBaUBSZql9WpC28CXBeuMKcGbz7LO5uvd3W9K3WjbBR0HzGiEg6dnfBfcdmJEcN",
+                "width": 4032
+            },
+            {
+                "height": 3024,
+                "html_attributions": [
+                    "<a href=\"https://maps.google.com/maps/contrib/101956238415981825199\">Sagar Timalsina</a>"
+                ],
+                "photo_reference": "AelY_CsJrQLmsXLIa_IiAXfIKOyq-BhMt9o49FQ7eIkADqbkjMtMzyJBUD03oexNlwmb8d6XMf7OQWFQwjMF3Er4UZeyzyH5vvooamyYu3TVt9NnjbfdUtR6UrHGz4pUvdwch4F2iye1PB5pSbdUTLDjECeF6QbVQbcwb0fTsoo0xFpeiLHJ",
+                "width": 4032
+            },
+            {
+                "height": 3000,
+                "html_attributions": [
+                    "<a href=\"https://maps.google.com/maps/contrib/104140636088525487284\">Gerhard Havlik</a>"
+                ],
+                "photo_reference": "AelY_CvMfhYr-e8AZakmn0Ym9Gdc1Q7MSDAzuEZDaKgkbKWHCrN1wajvK84zDAQXrU7RNehzPfkU2rAmLx5cWnufksXV002vIc6n47l6OXe1wmfWsMhLQk23PW6-WGtgc2hgl46r271OnsIdkt0AAnE4FvFJ1QkgkSgtQFIhZ5W_oPirsZCV",
+                "width": 4000
+            },
+            {
+                "height": 2352,
+                "html_attributions": [
+                    "<a href=\"https://maps.google.com/maps/contrib/113261763558618457017\">Wilfirmus</a>"
+                ],
+                "photo_reference": "AelY_CtybnDHrxUWvb_FQQGpOV3Qo6Pzna3I-NwGOz7wP1Om8A2VWdGEnHcUXzJBYFk3AH8mjuiME6wcOX1VV7OrbhXC3aQTFZ8pPdZLSku3224p9L0m8AkhOHmYYWv5QUdLNLZCMkYYefjYnlEpCzQ_Co0dFKBjjPVocmRh5P6C1W5quQwm",
+                "width": 4160
+            },
+            {
+                "height": 4032,
+                "html_attributions": [
+                    "<a href=\"https://maps.google.com/maps/contrib/114541402993501063706\">Chidi Ilobi</a>"
+                ],
+                "photo_reference": "AelY_CvxVCFhIWAht2ZilNy4aD3WekQWF2sKBrF7bkqqiszIKKqWb1c5YeOtvXdKiPn0i1itLxwyAoGrJGYjd6l_IZXsxhTtR1epAfCk0iPKzVNdYilRW792-6KEfzDY3geWRZSbX6T5qW2oTJP5tI963kiuMZv43DSTYGLWQdoIZUxrNwIz",
+                "width": 3024
+            },
+            {
+                "height": 4080,
+                "html_attributions": [
+                    "<a href=\"https://maps.google.com/maps/contrib/101597484841229205770\">Flo Yeow</a>"
+                ],
+                "photo_reference": "AelY_CsEJUdKvvFM66iK9tUVcTnU1Tjun8dgaduK7VQN8x4ZKbFz_W4_h2w1T70Kecuw5BCYZ7ufDSuL_w6kaKD4a7_KiuO8Q_SsEjskaWTc8iD_ZzK80sDapSr02FLwkHs6C4PoKOpe0nzZ_P79Zt1ccAEURm-xIc-OFCFpaVpiALfwe_D8",
+                "width": 3072
+            },
+            {
+                "height": 2448,
+                "html_attributions": [
+                    "<a href=\"https://maps.google.com/maps/contrib/109424226596487740627\">William Li</a>"
+                ],
+                "photo_reference": "AelY_CsqWv3SqHjiMpp56Ydui62Dv-l1-ekUZJx3rwLnKvbu-A6mSm40Y_qUiWeyDkqmjHTU38t_dK2jfhGt4V9rrYVjTW8x7NgiZ46gJfoAxxELA5a1RoaJeev6Brb4NbbX2HoaTSmBinb01OMAyIOqOJjFfCPeVaRGAiSRSSMDaAxHT0uk",
+                "width": 3264
+            },
+            {
+                "height": 4032,
+                "html_attributions": [
+                    "<a href=\"https://maps.google.com/maps/contrib/102558609090086310801\">Huy Tran</a>"
+                ],
+                "photo_reference": "AelY_CutYJPcVoo9ZDkY_9-6XRUMyAmi_NIA4quV0rYvs9t7omHIbfbSBIbSJHQs9DRJiJw8wc_Z_QZgf2IcCQA5v6vBOax2GhP-qDTvEJ6XCzGCrBD8MUJuHZfNtTIF2svXpaRQAvMjP8Y5GS2PmLkzpykRtKBDCHb73tsjkN17h7lzF__E",
+                "width": 3024
+            }
+        ],
+        "place_id": "ChIJN1t_tDeuEmsRUsoyG83frY4",
+        "plus_code": {
+            "compound_code": "45MW+C8 Pyrmont NSW, Australia",
+            "global_code": "4RRH45MW+C8"
+        },
+        "rating": 4,
+        "reference": "ChIJN1t_tDeuEmsRUsoyG83frY4",
+        "reviews": [
+            {
+                "author_name": "Flo Yeow",
+                "author_url": "https://www.google.com/maps/contrib/101597484841229205770/reviews",
+                "language": "en",
+                "original_language": "en",
+                "profile_photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjUCED0nHINoONtoIhYrg_037nt9gzG8G4ZOxJ3RLinEhCioWYU8hrs=s128-c0x00000000-cc-rp-mo-ba8",
+                "rating": 5,
+                "relative_time_description": "a year ago",
+                "text": "This is the Sales side of the couple of offices that Google has in Sydney. The engineering side is nicer but this is nice too.\n\nStraightforward set up, in a single column building, stairs and lift in the middle, and everything else around it. Professional baristas at The Press are really lovely people, and when I visited the dining hall was serving Carbonara on a cheese wheel. Make sure you stand at the rooftop balcony and enjoy the breeze and view of the surroundings.\n\nWith such gorgeous amenities and benefits, what's there not to like about working here.",
+                "time": 1670547584,
+                "translated": false
+            },
+            {
+                "author_name": "Matthew Hogan",
+                "author_url": "https://www.google.com/maps/contrib/108522641964881996448/reviews",
+                "language": "en",
+                "original_language": "en",
+                "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocJEWau_bviyS1BEzMEjDU8cso2nchWRKl27EKnx4g4aaGjHZw=s128-c0x00000000-cc-rp-mo",
+                "rating": 1,
+                "relative_time_description": "2 months ago",
+                "text": "I put it to Google that you are knowing and willingly allowing price gouging plumbing businesses to be on top of the search bar when they search my business name. I put it to Google that some people can not even find our web page when former clients search our company, just other companies that use us and then charge the client 400% to 700% what we charge them appear above us or we are not found at all.\n\nI put it to Google that you take around $100,000 to $400,000 in advertising revenue per month from one single plumbing company and I put it to you that you know there are many other plumbing companies that act in a similar way.\n\nI put it to Google that you are knowingly and willingly price gouging Australian citizens through entities that pay advertising revenue to Google.\n\nPlease contact us.",
+                "time": 1718780823,
+                "translated": false
+            },
+            {
+                "author_name": "Elaine Goldsack",
+                "author_url": "https://www.google.com/maps/contrib/110432054954844321941/reviews",
+                "language": "en",
+                "original_language": "en",
+                "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocIuV4oLmL0srTzmeunV7J0vF5qNtSrEhUQQZtK1lQWnHtD7ww=s128-c0x00000000-cc-rp-mo",
+                "rating": 5,
+                "relative_time_description": "2 months ago",
+                "text": "I\u2019m so happy I booked in with Pilar for a colour analysis. I always knew Autumn colours suited me best but I never knew exactly what shades to buy or how to wear them together. Pilar was a joy to be with. She\u2019s so friendly and she knows her stuff. She instantly put me at ease. Not only can I shop more confidently knowing what shades suit me best but she\u2019s also made me realise how wearing the right colour for me can completely lift my face. I love make up but when I\u2019m wearing a colour that is right for me, I\u2019m finding myself having a lot more make up free days.",
+                "time": 1717439195,
+                "translated": false
+            },
+            {
+                "author_name": "Hassan Bashir",
+                "author_url": "https://www.google.com/maps/contrib/112090586083780071235/reviews",
+                "language": "en",
+                "original_language": "en",
+                "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocI1-S_ECylGva-XSM7OqDhgXS17GWcKNmS0h1sbN_IICkvmDQ=s128-c0x00000000-cc-rp-mo-ba4",
+                "rating": 1,
+                "relative_time_description": "5 months ago",
+                "text": "I reported a fake review on my google page to google a while ago, and it still has not been actioned. I have a record of 5-star reviews on my business, and all of a sudden, someone I never dealt with leaves me a negative review, and there is nothing that I can do about.\nI know google doesn't look at these reviews, and they don't care, but I just want to put my frustration out there.",
+                "time": 1709165920,
+                "translated": false
+            },
+            {
+                "author_name": "Phillip McCallum",
+                "author_url": "https://www.google.com/maps/contrib/100072662673282433425/reviews",
+                "language": "en",
+                "original_language": "en",
+                "profile_photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjUbamfbGAzJ_EVbEedEyylwzMcKywDFC_UQENKXL8gllwN64kY=s128-c0x00000000-cc-rp-mo-ba5",
+                "rating": 1,
+                "relative_time_description": "2 months ago",
+                "text": "Trying to talk to google, I'm 64 and find google YTMusic frustrating for podcasts.\nYTM keeps giving me and playing music or podcasts I don't want. I have downloaded the podcaste I listen too.\nHard to get podcast without going to music.\nGoogle podcast worked well why change it.",
+                "time": 1718593189,
+                "translated": false
+            }
+        ],
+        "types": [
+            "point_of_interest",
+            "establishment"
+        ],
+        "url": "https://maps.google.com/?cid=10281119596374313554",
+        "user_ratings_total": 1014,
+        "utc_offset": 600,
+        "vicinity": "48 Pirrama Road, Pyrmont",
+        "website": "http://google.com/",
+        "wheelchair_accessible_entrance": true
+    },
+    "status": "OK"
+}

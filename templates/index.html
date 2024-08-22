@@ -1,0 +1,211 @@
+{% extends 'template.html' %}
+
+{% block head %}
+    <script>
+        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+        key: "{{ maps_key }}",
+        v: "weekly",
+        // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
+        // Add other bootstrap parameters as needed, using camel case.
+        });
+    </script>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/adaptive_box.js" defer></script>
+    <script src="/static/js/main.js" defer></script>
+    <script src="/static/js/heic2.js"></script>
+    <script src="/static/js/heic2png.js"></script>
+{% endblock %}
+{% block content %}
+    <div id="map"></div>
+    <div class="windows">
+        <div class="window main-window">
+            <div class="search-container">
+                <div class="search-bar">
+                    <input type="text" class="border-0 rounded-2" id="search">
+                </div>
+            </div>
+            <div class="adaptive-box-container">
+                <div class="adaptive-boxes">
+                    <div class="adaptive-box" id="home">
+                        <h1>Not Implemented Yet!</h1>
+                        <p>This will be the "home page" where it will display the top reviews and restaurant of the week.</p>
+                    </div>
+                    <div class="adaptive-box" id="review-1-1"> <!-- Upload Photo -->
+                        <h2 class="text-center">Upload a photo of the fries</h2>
+                        <div class="upload-section">
+                            <div class="dropzone">
+                                <div class="dz-default dz-message text-center">
+                                    <i class="bi bi-cloud-arrow-up" style="font-size: 2rem;"></i>
+                                    <div class="mt-3">Drop files here or click to upload.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <!-- <button type="button" class="btn btn-dark" data-ab-name="review-1-2" data-ab-dir="down">
+                                <i class="bi bi-camera"></i>
+                            </button> -->
+                            <button type="button" class="btn btn-dark" data-ab-name="review-2-1" id="next-btn-rev-1-1" disabled>Next</button>
+                        </div>
+                    </div>
+
+                    <div class="adaptive-box" id="review-2-1"> <!-- Rating and Options -->
+                        <section> <!-- Rating -->
+                            <label for="rating" class="form-label">
+                                <h2>Rating</h2>
+                            </label>
+                            <input type="range" class="form-range" id="rating" name="rating" min="1" max="5">
+                            <div class="border d-flex mt-3">
+                                <div id="rating-text" class="border-end"></div>
+                                <div id="rating-value"></div>
+                            </div>
+                        </section>
+                        <section>  <!-- Fry Options -->
+                            <div class="types">
+                                <h2>Fry Type</h2>
+                                {% for fry_type in fry_types %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="fryType" value="{{ fry_type }}">
+                                        <label class="form-check-label" for="fryType">
+                                            {{ fry_type }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="extras">
+                                <h2>More Options</h2>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="freshOrFrozen">
+                                    <label class="form-check-label" for="freshOrFrozen">
+                                        Fresh
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="hasToppings">
+                                    <label class="form-check-label" for="hasToppings">
+                                        Has Toppings
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="isSpiced">
+                                    <label class="form-check-label" for="isSpiced">
+                                        Spiced other than salt
+                                    </label>
+                                </div>
+                            </div>
+                        </section>
+                        <div class="ab-nav-buttons">
+                            <button type="button" class="btn btn-dark" data-ab-name="review-1-1" data-ab-dir="left">Back</button>
+                            <button type="button" class="btn btn-dark" data-ab-name="review-3-1" id="next-btn-rev-2-1" disabled>Next</button>
+                        </div>
+                    </div>
+
+                    <div class="adaptive-box" id="review-3-1"> <!-- Select Restaurant -->
+                        <section> <!-- TODO: Restaurant Select. Probably Move to another box -->
+                            <label for="restaurant" class="form-label">
+                                <h2>Select a restaurant</h2>
+                            </label>
+                            <div class="selected-restaurant">
+                                <div class="restaurant-info d-flex flex-column">
+                                    <input id="restaurant" readonly value="No Restaurant Selected" class="border-0 outline">
+                                    <div id="restaurant-address">Fry Rd, Pennsylvania, USA</div>
+                                </div>
+                                <div class="restaurant-image d-flex align-items-center justify-content-center bg-secondary rounded-1">
+                                    <i class="bi bi-shop"></i>
+                                    <img src="" alt="" id="restaurant-image">
+                                </div>
+                            </div>
+                            <input type="text" id="restaurant-search" class="form-control-plaintext" placeholder="Search for a restaurant...">
+                        </section>
+                        <div class="ab-nav-buttons">
+                            <button type="button" class="btn btn-dark" data-ab-name="review-2-1" data-ab-dir="left">Back</button>
+                            <button type="button" class="btn btn-dark" data-ab-name="review-4-1">Next</button>
+                        </div>
+                    </div>
+
+                    <div class="adaptive-box" id="review-4-1"> <!-- Extra Comments -->
+                        <h2>Comments</h2>
+                        <div class="form-floating">
+                            <textarea class="form-control" placeholder="Leave a comment here" id="comments" style="height: 100px"></textarea>
+                            <label for="comments">Comments</label>
+                        </div>
+                        <div class="ab-nav-buttons">
+                            <button type="button" class="btn btn-dark" data-ab-name="review-3-1" data-ab-dir="left">Back</button>
+                            <button type="button" class="btn btn-dark" id="review">Review</button>
+                        </div>
+                    </div>
+
+                    <div class="adaptive-box" id="restaurant-page">
+                        <div class="restaurant-page-thumbnail">
+                            <img src alt id="restaurant-thumbnail">
+                        </div>
+                        <div class="reviews"></div>
+                    </div>
+
+                    <div class="adaptive-box" id="search-page">
+                        <h2>Search</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="main-window-footer">
+                <div class="btn-group">
+                    <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn1" autocomplete="off" data-ab-name="home" data-ab-dir="left" checked>
+                    <label class="btn" for="radio-btn1">
+                        <i class="bi bi-house-door"></i>
+                        <span class="btn-small-text">Home</span>
+                    </label>
+
+                    <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn2" data-ab-name="review-1-1" autocomplete="off">
+                    <label class="btn" for="radio-btn2">
+                        <i class="bi bi-pencil-square"></i>
+                        <span class="btn-small-text">Review</span>
+                    </label>
+
+                    <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn3" autocomplete="off">
+                    <label class="btn" for="radio-btn3">
+                        <i class="bi bi-search"></i>
+                        <span class="btn-small-text">Search</span>
+                    </label>
+
+                    <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn4" data-ab-name="home" autocomplete="off">
+                    <label class="btn" for="radio-btn4">
+                        <i class="bi bi-cpu"></i>
+                        <span class="btn-small-text">Placeholder</span>
+                    </label>
+                    <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn5" data-ab-name="home" autocomplete="off">
+                    <label class="btn" for="radio-btn5">
+                        <i class="bi bi-cpu"></i>
+                        <span class="btn-small-text">Placeholder</span>
+                    </label>
+                  </div>
+            </div>
+        </div>
+    </div>
+    <div class="modals">
+        <div class="review-modals"></div>
+    </div>
+    <script>
+        window.fryTypes={{ fry_types|safe }};
+        // Initialize and add the map
+        let map;
+
+        async function initMap() {
+            // The location of Uluru
+            const position = { lat: 0, lng: 0 };
+            // Request needed libraries.
+            //@ts-ignore
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+            // The map, centered at Uluru
+            map = new Map(document.getElementById("map"), {
+                zoom: 3,
+                center: position,
+                mapId: "BIG_MAP",
+                disableDefaultUI: true,
+            });
+        }
+
+        initMap();
+    </script>
+{% endblock %}
