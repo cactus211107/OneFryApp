@@ -121,6 +121,29 @@ async function invalidFormInput(page,elm,error_title,error_content,box_dir='left
     console.error(error_content)
     // throw new Error("Rating not between 1 and 5");
 }
+function _putRestaurant(data) {
+    const restaurant_thumbnail=document.querySelector('#restaurant-thumbnail')
+    const restaurant_name=document.querySelector('#restaurant-name')
+    const restaurant_address=document.querySelector('#restaurant-address')
+    const restaurant_rating=document.querySelector('#restaurant-rating')
+
+    restaurant_thumbnail.src=data.thumbnail
+    restaurant_name=data.name
+    restaurant_address=data.address
+    restaurant_rating=data.rating
+}
+function resetReviewForm() {
+    dropzone.removeAllFiles()
+    rating_slider.value=3
+    getFryTypeElm().checked=false
+    is_fresh_box.checked=false
+    is_spiced_box.checked=false
+    has_toppings_box.checked=false
+    restaurant=''
+    document.querySelector('.selected-restaurant').innerHTML=`<div class="restaurant-info d-flex flex-column"><input id="restaurant" readonly="" value="No Restaurant Selected" class="border-0 outline"><div id="restaurant-address">Fry Rd, Pennsylvania, USA</div></div><div class="restaurant-image d-flex align-items-center justify-content-center bg-secondary rounded-1"><i class="bi bi-shop"></i><img src="" alt="" id="restaurant-image"></div>`
+    comment_box.value=''
+    restaurant_input.value=''
+}
 review_submit_btn.addEventListener('click',e=>{                         if(!e.isTrusted)return;
     const values=getReviewValues()
 
@@ -144,7 +167,7 @@ review_submit_btn.addEventListener('click',e=>{                         if(!e.is
     formData.append('hasToppings',values.hasToppings)
     formData.append('isSpiced',values.isSpiced)
     formData.append('fryType',values.fry_type)
-
+    formData.append('rating',values.rating)
     formData.append('restaurant',values.restaurant)
     formData.append('comments',values.comments)
     
@@ -161,17 +184,8 @@ review_submit_btn.addEventListener('click',e=>{                         if(!e.is
             addReview(reviews_elm,result.review,result.user.name)
             moveBox('restaurant-page','up')
 
-            // reset form
-            dropzone.removeAllFiles()
-            rating_slider.value=3
-            getFryTypeElm().checked=false
-            is_fresh_box.checked=false
-            is_spiced_box.checked=false
-            has_toppings_box.checked=false
-            restaurant=''
-            document.querySelector('.selected-restaurant').innerHTML=`<div class="restaurant-info d-flex flex-column"><input id="restaurant" readonly="" value="No Restaurant Selected" class="border-0 outline"><div id="restaurant-address">Fry Rd, Pennsylvania, USA</div></div><div class="restaurant-image d-flex align-items-center justify-content-center bg-secondary rounded-1"><i class="bi bi-shop"></i><img src="" alt="" id="restaurant-image"></div>`
-            comment_box.value=''
-            restaurant_input.value=''
+            resetReviewForm()
+
         }
     })
 })
@@ -192,9 +206,9 @@ Dropzone.autoDiscover = false;
 
 // Dropzone configuration
 var dropzone = new Dropzone(".dropzone", {
-    url: "/file/post", 
+    url: "/file/post", // just a fake path
     paramName: "file",
-    maxFilesize: 15, // MB
+    maxFilesize: 15, // unit is megabytes
     maxThumbnailFilesize:15,
     maxFiles: 10,
     thumbnailWidth:240,
@@ -205,7 +219,7 @@ var dropzone = new Dropzone(".dropzone", {
     autoProcessQueue: false,
     addRemoveLinks: true,
     thumbnailMethod:"contain",
-    dictRemoveFile: '✕', // Use "✕" for the remove text
+    dictRemoveFile: '✕',
 });
 const onchange_dropzone=()=>{
     image_upload_next.disabled=!dropzone.files.length

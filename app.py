@@ -31,16 +31,23 @@ REVIEW_COMMENTS_REQUIRED=True
 def genid(a:int=1024,b:int=2**24,*,number:bool=True,strLenMin:int=5,strLenMax:int=16):return random.randint(a,b) if number else"".join([random.choice(string.ascii_letters+string.digits) for x in range(random.randint(strLenMin,strLenMax))])
 def getDate():return datetime.datetime.now().strftime('%D-%M-%Y')
 def getDatetime():return datetime.datetime.now().strftime('%D-%M-%Y %H:%M:%S.%d')
-def getRestaurant(id):
+def getRestaurant(id,*,includeRating=False):
     r=db.execute('SELECT * FROM RESTAURANTS WHERE ID=? LIMIT 1',(id,)).fetchone()
     if r:
-        return {
+        rdict={
             "id":r[0],
             "name":r[1],
             "address":r[2],
             "lat":r[3],
             "lon":r[4]
         }
+        if includeRating:
+            reviews=db.execute('SELECT RATING FROM REVIEWS WHERE RESTAURANT=?',(id,)).fetchall()
+            s=sum([rev[0] for rev in reviews])
+            l=len(reviews)
+            rdict['reviews']=l
+            rdict['rating']=s/l if l>0 else 0
+        return rdict
     return False
 def getReview(id):
     r=list(db.execute('SELECT * FROM REVIEWS WHERE ID=? LIMIT 1',(int(id),)).fetchone())
@@ -59,7 +66,7 @@ def _addRestaurantAuto(id,thumb):
 def addRestaurantAuto(id,thumb):
     t=threading.Thread(target=_addRestaurantAuto,args=(id,thumb))
     t.start()
-def post(image_ids:list[str],type:str,fresh:bool,toppings:bool,spiced:bool,restaurant:str,comments:str,reviewer_id:int=None): # TODO implement users
+def post(image_ids:list[str],rating:int,type:str,fresh:bool,toppings:bool,spiced:bool,restaurant:str,comments:str,reviewer_id:int=None): # TODO implement users
     review_id=genid()
     db.execute(f'INSERT INTO REVIEWS VALUES ({"?,"*9}?)',(
         review_id,
@@ -89,12 +96,17 @@ def review_api():
     def er(e):return{"status":"error","error":e}
     f=request.form.get
     images=request.files.getlist('images')
+    rating=f('rating')
     restaurant=f('restaurant')
     comments=f('comments')
     fry_type=f('fryType')
     fresh=f('isFresh','n')
     toppings=f('hasToppings','n')
     spiced=f('isSpiced','n')
+    if 1>rating>5:
+        return er('Rating must be between 1 and 5.')
+    if int(rating)!=rating:
+        return er('Rating must be an integer.')
     if 'n' in [fresh,toppings,spiced]:
         return er('Fresh, Toppings, Spiced must exist')
     if fry_type not in FRY_TYPES:
@@ -150,13 +162,14 @@ def review_get_api(id):
             "status":"ok",
             "id":review[0],
             "images":json.loads(review[1]),
-            "restaurant":review[2],
-            "comments":review[3],
-            "fryType":review[4],
-            "fresh":review[5],
-            "toppings":review[6],
-            "spiced":review[7],
-            "reviewDate":review[8],
+            "rating":review[2],
+            "restaurant":review[3],
+            "comments":review[4],
+            "fryType":review[5],
+            "fresh":review[6],
+            "toppings":review[7],
+            "spiced":review[8],
+            "reviewDate":review[9],
         }
     return {
         "status":"error",

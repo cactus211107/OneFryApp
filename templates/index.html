@@ -22,7 +22,8 @@
         <div class="window main-window">
             <div class="search-container">
                 <div class="search-bar">
-                    <input type="text" class="border-0 rounded-2" id="search">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="border-0 rounded-2" id="search" autocomplete="off" spellcheck="false" autocapitalize="off">
                 </div>
             </div>
             <div class="adaptive-box-container">
@@ -138,6 +139,11 @@
                     <div class="adaptive-box" id="restaurant-page">
                         <div class="restaurant-page-thumbnail">
                             <img src alt id="restaurant-thumbnail">
+                        </div>
+                        <div class="restaurant-info">
+                            <h2 id="restaurant-name"></h2>
+                            <span id="restaurant-address"></span>
+                            <div id="restaurant-rating"></div> <!-- temp. remove later and add stars with (n Reviews) next to them. when `(n Reviews)` clicked, scroll to review section -->
                         </div>
                         <div class="reviews"></div>
                     </div>

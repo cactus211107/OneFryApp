@@ -60,7 +60,7 @@ html,body,.windows {
     width: var(--main-window-width);
     transform: translate(calc(var(--window-radius)* -1), calc(var(--window-radius)* -1));
     background: var(--primary-yellow);
-    padding: 10px;
+    padding: 16px 10px 10px;
     margin-bottom: auto;
 }
 .main-window {
@@ -174,10 +174,20 @@ label.btn {
     border: none !important;
     box-shadow: none !important;
 }
-.search-bar {
+/* .search-bar {
     display: flex;
     justify-content: space-around;
-}
+} */
+ .search-bar {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 5px 15px;
+    width: 300px;
+    font-size: 14px;
+    margin: auto;
+    border-radius: 11px;
+ }
 .ab-nav-buttons {
     display: flex;
     justify-content: space-between;
@@ -226,5 +236,10 @@ label.btn {
     cursor: pointer;
 }
 .comments {
+    font-size: 14px;
+}
+#search {
+    padding: 6px 9px 4px;
+    width: 300px;
     font-size: 14px;
 }
