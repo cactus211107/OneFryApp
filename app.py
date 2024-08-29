@@ -33,13 +33,15 @@ def getDate():return datetime.datetime.now().strftime('%D-%M-%Y')
 def getDatetime():return datetime.datetime.now().strftime('%D-%M-%Y %H:%M:%S.%d')
 def getRestaurant(id,*,includeRating=False):
     r=db.execute('SELECT * FROM RESTAURANTS WHERE ID=? LIMIT 1',(id,)).fetchone()
+    print('RRRRR',r)
     if r:
         rdict={
             "id":r[0],
             "name":r[1],
             "address":r[2],
-            "lat":r[3],
-            "lon":r[4]
+            "thumbnail":r[3],
+            "lat":r[4],
+            "lon":r[5]
         }
         if includeRating:
             reviews=db.execute('SELECT RATING FROM REVIEWS WHERE RESTAURANT=?',(id,)).fetchall()
@@ -48,29 +50,34 @@ def getRestaurant(id,*,includeRating=False):
             rdict['reviews']=l
             rdict['rating']=s/l if l>0 else 0
         return rdict
-    return False
+    return {}
 def getReview(id):
     r=list(db.execute('SELECT * FROM REVIEWS WHERE ID=? LIMIT 1',(int(id),)).fetchone())
     r[5]=bool(r[5])
     r[6]=bool(r[6])
     r[7]=bool(r[7])
     return r
-def _addRestaurantAuto(id,thumb):
-    place=maps.getPlace(id,['geometry','name','formatted_address']) # TODO put nesciscary fields
+def _addRestaurantAuto(id,thumb,google_data):
+    place=google_data
+    if not google_data:
+        place=maps.getPlace(id,['geometry','name','formatted_address']) # TODO put nesciscary fields
     name=place['name']
     address=place['formatted_address']
     l=place['geometry']['location']
     lat=l['lat']
     lon=l['lng']
     db.execute('INSERT INTO RESTAURANTS VALUES (?,?,?,?,?,?)',(id,name,address,thumb,lat,lon))
-def addRestaurantAuto(id,thumb):
-    t=threading.Thread(target=_addRestaurantAuto,args=(id,thumb))
-    t.start()
+def addRestaurantAuto(id,thumb,*,google_data:dict=None):
+    if google_data:_addRestaurantAuto(id,thumb,google_data)
+    else:
+        t=threading.Thread(target=_addRestaurantAuto,args=(id,thumb,google_data))
+        t.start()
 def post(image_ids:list[str],rating:int,type:str,fresh:bool,toppings:bool,spiced:bool,restaurant:str,comments:str,reviewer_id:int=None): # TODO implement users
     review_id=genid()
-    db.execute(f'INSERT INTO REVIEWS VALUES ({"?,"*9}?)',(
+    db.execute(f'INSERT INTO REVIEWS VALUES ({"?,"*10}?)',(
         review_id,
         json.dumps(image_ids),
+        rating,
         restaurant,
         comments,
         type,
@@ -97,6 +104,8 @@ def review_api():
     f=request.form.get
     images=request.files.getlist('images')
     rating=f('rating')
+    try:rating=int(rating)
+    except:return er('Rating could not be converted to an integer.')
     restaurant=f('restaurant')
     comments=f('comments')
     fry_type=f('fryType')
@@ -105,8 +114,6 @@ def review_api():
     spiced=f('isSpiced','n')
     if 1>rating>5:
         return er('Rating must be between 1 and 5.')
-    if int(rating)!=rating:
-        return er('Rating must be an integer.')
     if 'n' in [fresh,toppings,spiced]:
         return er('Fresh, Toppings, Spiced must exist')
     if fry_type not in FRY_TYPES:
@@ -114,7 +121,8 @@ def review_api():
     for img in images: # initial checks
         if not img.mimetype.startswith('image/'):
             return er("All uploaded files must be images.")
-    if not maps.exists(restaurant):
+    gd:dict=maps.getPlace(restaurant) #gd==google data
+    if type(gd.get('geometry'))!=dict:
         return er(f'Place id "{restaurant}" does not exist.')
     if not comments and REVIEW_COMMENTS_REQUIRED:
         return er("Comments are required.\nThat is where you write your review.")
@@ -144,12 +152,12 @@ def review_api():
         return er('Error when compressing / saving images.')
     
     if not getRestaurant(restaurant):
-        addRestaurantAuto(restaurant,f'usercontent/uploads/{img_ids[0]}.webp')
+        addRestaurantAuto(restaurant,f'usercontent/uploads/{img_ids[0]}.webp',google_data=gd)
     reviewer=0
-    rev_id=post(img_ids,fry_type,fresh,toppings,spiced,restaurant,comments,reviewer)
+    rev_id=post(img_ids,rating,fry_type,fresh,toppings,spiced,restaurant,comments,reviewer)
     return {
         "status":"ok",
-        "restaurant":getRestaurant(restaurant),
+        "restaurant":getRestaurant(restaurant,includeRating=True),
         "review":review_get_api(rev_id),
         "user":getUser(reviewer)
     }

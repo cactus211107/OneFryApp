@@ -1,3 +1,6 @@
+function getBottomNavChecked() {
+    return document.querySelector('[name="vbtn-radio"]:checked')
+}
 const fryTypes = window.fryTypes
 const rating_slider=document.querySelector('#rating')
 const rating_text=document.querySelector('#rating-text')
@@ -13,6 +16,25 @@ const is_fresh_box=document.querySelector('#freshOrFrozen')
 const has_toppings_box=document.querySelector('#hasToppings')
 const is_spiced_box=document.querySelector('#isSpiced')
 const comment_box=document.querySelector('#comments')
+
+const restaurant_thumbnail=document.querySelector('#restaurant-thumbnail')
+    const restaurant_name=document.querySelector('#restaurant-name')
+    const restaurant_address=document.querySelector('#restaurant-address')
+    const restaurant_rating=document.querySelector('#restaurant-rating')
+
+const restaurant_nav_btn=document.querySelector('#bottom-nav-restaurant')
+restaurant_nav_btn.addEventListener('click',()=>{
+    if (restaurant_address.innerText) {
+        moveBox('restaurant-page','right')
+    } else {
+        try {
+            getBottomNavChecked().checked=false
+            search_page_select.checked=true
+        }catch{}
+        moveBox('search-page','left')
+    }
+})
+
 const restaurant_input=document.querySelector('#restaurant-search')
 function getFryTypeElm() {
     return document.querySelector('[name="fryType"]:checked')
@@ -122,15 +144,13 @@ async function invalidFormInput(page,elm,error_title,error_content,box_dir='left
     // throw new Error("Rating not between 1 and 5");
 }
 function _putRestaurant(data) {
-    const restaurant_thumbnail=document.querySelector('#restaurant-thumbnail')
-    const restaurant_name=document.querySelector('#restaurant-name')
-    const restaurant_address=document.querySelector('#restaurant-address')
-    const restaurant_rating=document.querySelector('#restaurant-rating')
-
     restaurant_thumbnail.src=data.thumbnail
-    restaurant_name=data.name
-    restaurant_address=data.address
-    restaurant_rating=data.rating
+    restaurant_name.innerText=data.name
+    restaurant_address.innerText=data.address
+
+    restaurant_rating.innerHTML=''
+    ratingStars(restaurant_rating,data.rating)
+    restaurant_rating.innerHTML+=`<span>(${data.reviews} review${data.reviews==1?'':'s'})</span>`
 }
 function resetReviewForm() {
     dropzone.removeAllFiles()
@@ -140,7 +160,16 @@ function resetReviewForm() {
     is_spiced_box.checked=false
     has_toppings_box.checked=false
     restaurant=''
-    document.querySelector('.selected-restaurant').innerHTML=`<div class="restaurant-info d-flex flex-column"><input id="restaurant" readonly="" value="No Restaurant Selected" class="border-0 outline"><div id="restaurant-address">Fry Rd, Pennsylvania, USA</div></div><div class="restaurant-image d-flex align-items-center justify-content-center bg-secondary rounded-1"><i class="bi bi-shop"></i><img src="" alt="" id="restaurant-image"></div>`
+    document.querySelector('.selected-restaurant').innerHTML=
+    `   <div class="restaurant-info d-flex flex-column">
+            <input id="restaurant" readonly value="No Restaurant Selected" class="border-0 outline">
+            <div id="restaurant-address-review" class="restaurant-address">Fry Rd, Pennsylvania, USA</div>
+        </div>
+        <div class="restaurant-image d-flex align-items-center justify-content-center bg-secondary rounded-1">
+            <i class="bi bi-shop"></i>
+            <img src="" alt="" id="restaurant-image">
+        </div>
+    `
     comment_box.value=''
     restaurant_input.value=''
 }
@@ -185,7 +214,10 @@ review_submit_btn.addEventListener('click',e=>{                         if(!e.is
             moveBox('restaurant-page','up')
 
             resetReviewForm()
-
+            _putRestaurant(result.restaurant)
+            try {
+                getBottomNavChecked().checked=false
+            }catch{}
         }
     })
 })

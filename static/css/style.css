@@ -3,7 +3,7 @@
     --total-window-padding:calc(var(--window-radius) * 2);
     --main-window-width:450px;
     --main-window-inside-width:calc(var(--main-window-width) - var(--total-window-padding));
-    --adaptive-box-height:500px;
+    --adaptive-box-height:540px;
 }
 .hidden {
     display: none !important;
@@ -56,7 +56,7 @@ html,body,.windows {
     gap: 10px;
 }
 .search-container {
-    height: 200px;
+    height: 120px;
     width: var(--main-window-width);
     transform: translate(calc(var(--window-radius)* -1), calc(var(--window-radius)* -1));
     background: var(--primary-yellow);
@@ -165,9 +165,19 @@ label.btn {
     font-size: 20px;
     border-radius: 2px;
 }
-#restaurant-address {
+.restaurant-address,#restaurant-address {
     color: var(--gray-text);
     font-size: 12px;
+}
+.restaurant-page-thumbnail {
+    width: 100%;
+}
+#restaurant-thumbnail {
+    width: 100%;
+    max-width: -webkit-fill-available;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
 }
 #map * {
     outline: none !important;
@@ -200,8 +210,19 @@ label.btn {
 .popover.text-bg-warning > .popover-arrow {
     --bs-popover-bg:var(--bs-warning)
 }
-
-
+#restaurant-name {
+    margin-bottom: 2px;
+}
+.star {
+    max-width: 24px;
+    max-height: 24px;
+}
+#restaurant-rating {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    color: #2c75f4;
+}
 
 
 

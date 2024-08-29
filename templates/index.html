@@ -15,6 +15,7 @@
     <script src="/static/js/main.js" defer></script>
     <script src="/static/js/heic2.js"></script>
     <script src="/static/js/heic2png.js"></script>
+    <script src="/static/js/stars.js"></script>
 {% endblock %}
 {% block content %}
     <div id="map"></div>
@@ -109,7 +110,7 @@
                             <div class="selected-restaurant">
                                 <div class="restaurant-info d-flex flex-column">
                                     <input id="restaurant" readonly value="No Restaurant Selected" class="border-0 outline">
-                                    <div id="restaurant-address">Fry Rd, Pennsylvania, USA</div>
+                                    <div id="restaurant-address-review" class="restaurant-address">Fry Rd, Pennsylvania, USA</div>
                                 </div>
                                 <div class="restaurant-image d-flex align-items-center justify-content-center bg-secondary rounded-1">
                                     <i class="bi bi-shop"></i>
@@ -141,7 +142,7 @@
                             <img src alt id="restaurant-thumbnail">
                         </div>
                         <div class="restaurant-info">
-                            <h2 id="restaurant-name"></h2>
+                            <h3 id="restaurant-name"></h3>
                             <span id="restaurant-address"></span>
                             <div id="restaurant-rating"></div> <!-- temp. remove later and add stars with (n Reviews) next to them. when `(n Reviews)` clicked, scroll to review section -->
                         </div>
@@ -173,10 +174,10 @@
                         <span class="btn-small-text">Search</span>
                     </label>
 
-                    <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn4" data-ab-name="home" autocomplete="off">
-                    <label class="btn" for="radio-btn4">
-                        <i class="bi bi-cpu"></i>
-                        <span class="btn-small-text">Placeholder</span>
+                    <input type="radio" class="btn-check" name="vbtn-radio" id="bottom-nav-restaurant" autocomplete="off">
+                    <label class="btn" for="bottom-nav-restaurant">
+                        <i class="bi bi-shop"></i>
+                        <span class="btn-small-text">Restaurant</span>
                     </label>
                     <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn5" data-ab-name="home" autocomplete="off">
                     <label class="btn" for="radio-btn5">
