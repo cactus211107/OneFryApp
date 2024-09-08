@@ -5,3 +5,4 @@ usercontent
 *__pycache__*
 *.key
 .DS_Store
+*.db

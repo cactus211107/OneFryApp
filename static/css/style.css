@@ -154,16 +154,45 @@ label.btn {
     padding: 5px;
 }
 .restaurant-image {
-    width: 50px;
+    min-width: 50px;
+    max-width: 50px;
     height: 50px;
     font-size: 20px;
 }
-.selected-restaurant {
+.restaurant-info {
+    max-width: 308px;
+}
+.restaurant-search-results,#restaurant-search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 6px;
+    max-height: 300px;
+    
+}
+.restaurant-image>img:not([src=""]) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.25rem;
+}
+.selected-restaurant,.restaurant-search-result {
     display: flex;
     align-items: center;
     gap: 20px;
     font-size: 20px;
     border-radius: 2px;
+}
+.restaurant-search-result {
+    cursor: pointer;
+    border-top: 2px grey solid;
+    padding-top: 8px;
+}
+.restaurant-image>.bi.bi-shop {
+    display: block;
+}
+.restaurant-image>.bi.bi-shop:has(+img:not([src=""])) {
+    display: none;
 }
 .restaurant-address,#restaurant-address {
     color: var(--gray-text);
@@ -212,6 +241,7 @@ label.btn {
 }
 #restaurant-name {
     margin-bottom: 2px;
+    font-size: 1.7rem;
 }
 .star {
     max-width: 24px;
@@ -225,7 +255,11 @@ label.btn {
 }
 
 
-
+.reviews {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 .review {
     display: flex;
     flex-direction: column;

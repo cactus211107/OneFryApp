@@ -1,6 +1,7 @@
 {% extends 'template.html' %}
 
 {% block head %}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ maps_key }}&libraries=places"></script>
     <script>
         (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
         key: "{{ maps_key }}",
@@ -12,9 +13,11 @@
 
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="/static/js/adaptive_box.js" defer></script>
+    <script src="/static/js/map.js"></script>
     <script src="/static/js/main.js" defer></script>
     <script src="/static/js/heic2.js"></script>
     <script src="/static/js/heic2png.js"></script>
+    <script src="/static/js/exif.js"></script>
     <script src="/static/js/stars.js"></script>
 {% endblock %}
 {% block content %}
@@ -103,21 +106,24 @@
                     </div>
 
                     <div class="adaptive-box" id="review-3-1"> <!-- Select Restaurant -->
-                        <section> <!-- TODO: Restaurant Select. Probably Move to another box -->
+                        <section>
                             <label for="restaurant" class="form-label">
                                 <h2>Select a restaurant</h2>
                             </label>
                             <div class="selected-restaurant">
                                 <div class="restaurant-info d-flex flex-column">
-                                    <input id="restaurant" readonly value="No Restaurant Selected" class="border-0 outline">
-                                    <div id="restaurant-address-review" class="restaurant-address">Fry Rd, Pennsylvania, USA</div>
+                                    <div id="review-restaurant-final" class="border-0 outline text-truncate">No Restaurant Selected</div>
+                                    <div id="review-restaurant-address-final" class="restaurant-address text-truncate">Fry Rd, Pennsylvania, USA</div>
                                 </div>
                                 <div class="restaurant-image d-flex align-items-center justify-content-center bg-secondary rounded-1">
                                     <i class="bi bi-shop"></i>
-                                    <img src="" alt="" id="restaurant-image">
+                                    <img src="" alt="" id="restaurant-image-final">
                                 </div>
                             </div>
                             <input type="text" id="restaurant-search" class="form-control-plaintext" placeholder="Search for a restaurant...">
+                            <div id="restaurant-search-results" id="restaurant-search-results">
+                                
+                            </div>
                         </section>
                         <div class="ab-nav-buttons">
                             <button type="button" class="btn btn-dark" data-ab-name="review-2-1" data-ab-dir="left">Back</button>
@@ -151,6 +157,9 @@
 
                     <div class="adaptive-box" id="search-page">
                         <h2>Search</h2>
+                        <div class="restaurant-search-results" id="search-page-results">
+                        
+                        </div>
                     </div>
                 </div>
             </div>
@@ -179,11 +188,18 @@
                         <i class="bi bi-shop"></i>
                         <span class="btn-small-text">Restaurant</span>
                     </label>
-                    <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn5" data-ab-name="home" autocomplete="off">
+                    <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn5" data-ab-name="home" data-ab-dir="down" autocomplete="off">
                     <label class="btn" for="radio-btn5">
-                        <i class="bi bi-cpu"></i>
-                        <span class="btn-small-text">Placeholder</span>
+                        <i class="bi bi-person-circle"></i>
+                        <span class="btn-small-text">Profile</span>
                     </label>
+                    {% if userIsAdmin %}
+                        <input type="radio" class="btn-check" name="vbtn-radio" id="admin-btn-bottom-nav" autocomplete="off" onclick="window.open('/ui/admin','_blank')">
+                        <label class="btn" for="admin-btn-bottom-nav">
+                            <i class="bi bi-cpu"></i>
+                            <span class="btn-small-text">Admin</span>
+                        </label>
+                    {% endif %}
                   </div>
             </div>
         </div>

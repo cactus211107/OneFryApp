@@ -18,9 +18,10 @@ const is_spiced_box=document.querySelector('#isSpiced')
 const comment_box=document.querySelector('#comments')
 
 const restaurant_thumbnail=document.querySelector('#restaurant-thumbnail')
-    const restaurant_name=document.querySelector('#restaurant-name')
-    const restaurant_address=document.querySelector('#restaurant-address')
-    const restaurant_rating=document.querySelector('#restaurant-rating')
+const restaurant_name=document.querySelector('#restaurant-name')
+const restaurant_address=document.querySelector('#restaurant-address')
+const restaurant_rating=document.querySelector('#restaurant-rating')
+const reviews_elm=document.querySelector('#restaurant-page .reviews')
 
 const restaurant_nav_btn=document.querySelector('#bottom-nav-restaurant')
 restaurant_nav_btn.addEventListener('click',()=>{
@@ -35,13 +36,67 @@ restaurant_nav_btn.addEventListener('click',()=>{
     }
 })
 
+const search_page_results=document.querySelector('#search-page-results')
+const search_page_filter=document.querySelector('#search-page-filter')
+
 const restaurant_input=document.querySelector('#restaurant-search')
+const restaurant_search_results=document.querySelector('#restaurant-search-results')
+restaurant_input.addEventListener('input',async ()=>{
+    if (!restaurant_input.value){
+        restaurant_search_results.innerHTML=''
+        return
+    }
+    const results=await performTextSearch(restaurant_input.value);
+    restaurant_search_results.innerHTML=''
+    if (!results)return;
+    for (const result of results) {
+        const id='r'+Math.random().toString().replace('.',0)
+        const elm=document.createElement('div')
+        elm.className='restaurant-search-result'
+        elm.id=id
+        elm.innerHTML=`
+            <div class="restaurant-info d-flex flex-column">
+                <div class="border-0 outline text-truncate">${result.name}</div>
+                <div class="restaurant-address text-truncate">${result.address}</div>
+            </div>
+            <div class="restaurant-image d-flex align-items-center justify-content-center bg-secondary rounded-1">
+                <img src="${result.photo}" alt="🍟">
+            </div>`
+        elm.addEventListener('click',()=>{
+            let r=result;
+            console.log(r)
+            review_selected_restaurant=r.id
+            document.querySelector('#review-restaurant-final').innerText=r.name
+            document.querySelector('#restaurant-image-final').src=r.photo
+            document.querySelector('#review-restaurant-address-final').innerText=r.address
+        })
+        restaurant_search_results.append(elm)
+    }
+})
 function getFryTypeElm() {
     return document.querySelector('[name="fryType"]:checked')
 }
-
-let restaurant = 'ChIJN1t_tDeuEmsRUsoyG83frY4'
-
+async function getRestaurant(id) {
+    let data=await fetch('/api/restaurant/'+id).then(r=>r.json()).then(_=>{return _})
+    return data
+}
+let review_selected_restaurant = 'ChIJN1t_tDeuEmsRUsoyG83frY4'
+let selected_restaurant=''
+let restaurant_reviews_start=0;
+let restaurant_reviews_stop=20;
+function getRestauantReviews(id,start,stop,sort,callback) {
+    fetch(`/api/reviews/${id}?start=${start}&stop=${stop}&sort=${sort}`).then(response=>response.json()).then(callback)
+}
+function addRestaurantReviews(id,start,stop,sort,cur_review=-1) {
+    getRestauantReviews(id,start,stop,sort,result=>{
+        console.log(result)
+        if (result.status!='ok')return;
+        for (const review of result.reviews) {
+            if (cur_review==review.id)continue;
+            addReview(reviews_elm,review)
+        }
+    })
+}
 const rating_to_text=[
     ["Bad","Do not go"],
     ["Meh","Not worth driving for"],
@@ -72,10 +127,10 @@ function invalidFormElm(elm,title,content,parent,dir='top') {
     // return x
     
 }
-function addReview(parent,review,reviewer) {
+function addReview(parent,review) {
     parent.innerHTML+=`<div class="review" id="review-${review.id}">
                 <section class="top-review">
-                    <div class="reviewer-name">${reviewer}</div>
+                    <div class="reviewer-name">${review.reviewer.name}</div>
                     <div class="review-date">${review.reviewDate}</div>
                 </section>
                 <section class="bottom-review">
@@ -116,9 +171,48 @@ const illegal = setInterval(()=>{
 
 const search_page_select=document.querySelector('#radio-btn3')
 const search_input=document.querySelector('#search')
-// document.createElement('input').addEventListener('toggle')
-search_page_select.addEventListener('click',()=>{
+search_input.addEventListener('input',()=>{
+    if (!search_input.value) {
+        search_page_results.innerHTML=''
+        return
+    }
+    // &search_page_filter.value
+    fetch(`/api/search/restaurants?query=${search_input.value}`).then(response=>response.json()).then(result=>{
+        search_page_results.innerHTML=''
+        console.log(result)
+        if (result.status!=='ok') {
+            return
+        }
+        for (const restaurant of result.results) {
+            const elm=document.createElement('div')
+            const id='r'+Math.random().toString().replace('.',0)
+            elm.className='restaurant-search-result'
+            elm.id=id
+            elm.innerHTML=`
+                <div class="restaurant-image d-flex align-items-center justify-content-center bg-secondary rounded-1">
+                    <img src="${restaurant.thumbnail}" alt="🍟">
+                </div>
+                <div class="restaurant-info d-flex flex-column">
+                    <div class="border-0 outline text-truncate">${restaurant.name}</div>
+                    <div class="stars">
+                        ${ratingStarsText(restaurant.rating)}
+                        (${restaurant.reviews} review${restaurant.reviews.length!==1?'s':''})
+                    </div>
+                    <div class="restaurant-address text-truncate">${restaurant.address}</div>
+                </div>
+                `
+            elm.addEventListener('click',()=>{
+                _putRestaurant(restaurant)
+                moveBox('restaurant-page','right')
+            })
+            search_page_results.append(elm)
+        }
+    })
+})
+search_input.addEventListener('focus',()=>{
     moveBox("search-page",'left')
+})
+search_page_select.addEventListener('click',()=>{
     search_input.focus()
 })
 
@@ -131,7 +225,7 @@ function getReviewValues() {
         fresh:is_fresh_box.checked,
         hasToppings:has_toppings_box.checked,
         isSpiced:is_spiced_box.checked,
-        restaurant:restaurant,
+        restaurant:review_selected_restaurant,
         comments:comment_box.value
     }
 }
@@ -143,7 +237,7 @@ async function invalidFormInput(page,elm,error_title,error_content,box_dir='left
     console.error(error_content)
     // throw new Error("Rating not between 1 and 5");
 }
-function _putRestaurant(data) {
+function _putRestaurant(data,cur_review=-1) {
     restaurant_thumbnail.src=data.thumbnail
     restaurant_name.innerText=data.name
     restaurant_address.innerText=data.address
@@ -151,6 +245,7 @@ function _putRestaurant(data) {
     restaurant_rating.innerHTML=''
     ratingStars(restaurant_rating,data.rating)
     restaurant_rating.innerHTML+=`<span>(${data.reviews} review${data.reviews==1?'':'s'})</span>`
+    addRestaurantReviews(data.id,0,20,'relevance',cur_review)
 }
 function resetReviewForm() {
     dropzone.removeAllFiles()
@@ -159,19 +254,20 @@ function resetReviewForm() {
     is_fresh_box.checked=false
     is_spiced_box.checked=false
     has_toppings_box.checked=false
-    restaurant=''
+    review_selected_restaurant=''
     document.querySelector('.selected-restaurant').innerHTML=
     `   <div class="restaurant-info d-flex flex-column">
-            <input id="restaurant" readonly value="No Restaurant Selected" class="border-0 outline">
-            <div id="restaurant-address-review" class="restaurant-address">Fry Rd, Pennsylvania, USA</div>
+            <div id="review-restaurant-final" class="border-0 outline text-truncate">No Restaurant Selected</div>
+            <div id="review-restaurant-address-final" class="restaurant-address text-truncate">Fry Rd, Pennsylvania, USA</div>
         </div>
         <div class="restaurant-image d-flex align-items-center justify-content-center bg-secondary rounded-1">
             <i class="bi bi-shop"></i>
-            <img src="" alt="" id="restaurant-image">
+            <img src="" alt="" id="restaurant-image-final">
         </div>
     `
     comment_box.value=''
     restaurant_input.value=''
+    restaurant_search_results.innerHTML=''
 }
 review_submit_btn.addEventListener('click',e=>{                         if(!e.isTrusted)return;
     const values=getReviewValues()
@@ -207,17 +303,21 @@ review_submit_btn.addEventListener('click',e=>{                         if(!e.is
             invalidFormElm(review_submit_btn,'Invalid Input!',result.error)
         }
         if (result.status=='ok') {
-            const reviews_elm=document.querySelector('#restaurant-page .reviews')
+            selected_restaurant=result.restaurant.id
             reviews_elm.innerHTML=''
             review_modals.innerHTML=''
-            addReview(reviews_elm,result.review,result.user.name)
+            addReview(reviews_elm,result.review)
             moveBox('restaurant-page','up')
 
             resetReviewForm()
-            _putRestaurant(result.restaurant)
+            _putRestaurant(result.restaurant,result.review.id)
             try {
                 getBottomNavChecked().checked=false
             }catch{}
+            restaurant_reviews_start=0;
+            restaurant_reviews_stop=20;
+            // addRestaurantReviews(selected_restaurant,restaurant_reviews_start,restaurant_reviews_stop,'newest',result.review.id) // TODO add sort dropdown
+            displayRestaurantMapIcons()
         }
     })
 })
@@ -245,7 +345,7 @@ var dropzone = new Dropzone(".dropzone", {
     maxFiles: 10,
     thumbnailWidth:240,
     thumbnailHeight:240,
-    acceptedFiles: 'image/*',
+    acceptedFiles: 'image/*,image/heic,image/heif',
     dictDefaultMessage: "Drag files here or click to upload.",
     clickable: true,
     autoProcessQueue: false,
@@ -253,14 +353,43 @@ var dropzone = new Dropzone(".dropzone", {
     thumbnailMethod:"contain",
     dictRemoveFile: '✕',
 });
-const onchange_dropzone=()=>{
-    image_upload_next.disabled=!dropzone.files.length
-}
-dropzone.on("addedfile",onchange_dropzone)
-dropzone.on("removedfile",onchange_dropzone)
+(()=>{
+    const onchange_dropzone = () => {
+        image_upload_next.disabled = !dropzone.files.length;
+    };
+    // for some reason no exif exists, when it actually does
+    const fileChangedHandler = (file) => {
+        EXIF.getData(file, function () {
+            console.log('Exif',EXIF.getAllTags(this));
+        });
+    };
+    function convertDMSToDD(dms, ref) {
+        const degrees = dms[0];
+        const minutes = dms[1];
+        const seconds = dms[2];
+        const dd = degrees + minutes / 60 + seconds / 3600;
+        return ref === "S" || ref === "W" ? -dd : dd;
+    }  
+    dropzone.on("addedfile", async e=>{
+        onchange_dropzone()
+        if (e.type=='image/heic'||e.type=='image/heif') {
+            let url = await convertHEIC(e)
+            dropzone.files[0].previewElement.querySelector('img').src=url
+        }
+    });
+    dropzone.on("removedfile", onchange_dropzone);
+})()
+
 
 for (const radio of document.querySelectorAll('[name="fryType"]')) {
     radio.addEventListener('input',()=>{
         options_next.disabled=!getFryTypeElm()
     })
 }
+function displayRestaurantMapIcons() {
+    fetch('/api/restaurants').then(response=>response.json()).then(result=>{
+        remove_all_restaurant_map_icons()
+        display_restaurant_buttons_on_map(result)
+    })
+}
+displayRestaurantMapIcons()

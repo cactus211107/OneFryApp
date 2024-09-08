@@ -1,7 +1,7 @@
 from flask import *
 import random,string,json,shutil,os,threading,datetime
-import db,maps,image
-_reset=True
+import db,maps,image,relevance
+_reset=False
 if _reset:
     try:os.remove('database.db')
     except:0
@@ -27,10 +27,14 @@ FRY_TYPES=[
 ]
 app = Flask(__name__)
 REVIEW_COMMENTS_REQUIRED=True
+DATE_FORMAT='%d-%m-%y'
+DATETIME_FORMAT=DATE_FORMAT+'/%H:%M:%S.%f'
 
 def genid(a:int=1024,b:int=2**24,*,number:bool=True,strLenMin:int=5,strLenMax:int=16):return random.randint(a,b) if number else"".join([random.choice(string.ascii_letters+string.digits) for x in range(random.randint(strLenMin,strLenMax))])
-def getDate():return datetime.datetime.now().strftime('%D-%M-%Y')
-def getDatetime():return datetime.datetime.now().strftime('%D-%M-%Y %H:%M:%S.%d')
+def getDate():return datetime.datetime.now().strftime(DATE_FORMAT)
+def getDatetime():return datetime.datetime.now().strftime('%d-%m-%y/%H:%M:%S.%f')
+def textToDatetime(dt):return datetime.datetime.strptime(dt,DATETIME_FORMAT)
+def dateToText(date:datetime.datetime,isDatetime=False):return f"{['January','February','March','April','May','June','July','August','September','October','November','December'][date.month-1]} {date.day}, {date.year}{f' at {date.hour}:{date.minute}:{date.second}'if isDatetime else''}"
 def getRestaurant(id,*,includeRating=False):
     r=db.execute('SELECT * FROM RESTAURANTS WHERE ID=? LIMIT 1',(id,)).fetchone()
     print('RRRRR',r)
@@ -49,6 +53,7 @@ def getRestaurant(id,*,includeRating=False):
             l=len(reviews)
             rdict['reviews']=l
             rdict['rating']=s/l if l>0 else 0
+            rdict['score']=((rdict['rating']/2.5))**l
         return rdict
     return {}
 def getReview(id):
@@ -74,7 +79,13 @@ def addRestaurantAuto(id,thumb,*,google_data:dict=None):
         t.start()
 def post(image_ids:list[str],rating:int,type:str,fresh:bool,toppings:bool,spiced:bool,restaurant:str,comments:str,reviewer_id:int=None): # TODO implement users
     review_id=genid()
-    db.execute(f'INSERT INTO REVIEWS VALUES ({"?,"*10}?)',(
+    def addRelevancyThread(rid,comments):
+        # I put it in a thread because it takes up time
+        # about 4 seconds, so it is fast to review.
+        # but if I get a server, it should be faster
+        rel=relevance.getRelevancy(comments)
+        db.execute('UPDATE REVIEWS SET RELEVANCE=?,RELEVANCE_REASON=? WHERE ID=?',(rel['relevance'],rel['reason'],rid))
+    db.execute(f'INSERT INTO REVIEWS VALUES ({"?,"*12}?)',(
         review_id,
         json.dumps(image_ids),
         rating,
@@ -86,42 +97,42 @@ def post(image_ids:list[str],rating:int,type:str,fresh:bool,toppings:bool,spiced
         spiced*1,
         getDatetime(),
         reviewer_id,
+        100,
+        ""
     ))
+    rel_thread=threading.Thread(target=addRelevancyThread,args=(review_id,comments))
+    rel_thread.start()
     return review_id
 def getUser(id):
     # return db.execute('SELECT * FROM UESRS WHERE ID=?',(id,))
     return {"id":id,"name":'Jack Rushmore'} # because i dont have users yet
-
-
+def er(e):return{"status":"error","error":e}
 
 @app.route('/')
 def index():
-    return render_template('index.html',fry_types=FRY_TYPES)
+    return render_template('index.html',fry_types=FRY_TYPES,userIsAdmin=True)
 
 @app.route('/review',methods=['POST'])
 def review_api():
-    def er(e):return{"status":"error","error":e}
     f=request.form.get
     images=request.files.getlist('images')
-    rating=f('rating')
-    try:rating=int(rating)
-    except:return er('Rating could not be converted to an integer.')
-    restaurant=f('restaurant')
-    comments=f('comments')
-    fry_type=f('fryType')
-    fresh=f('isFresh','n')
-    toppings=f('hasToppings','n')
-    spiced=f('isSpiced','n')
+    rating=f('rating',-1,type=int)
+    if rating==-1:
+        return er('Rating could not be converted to an integer.')
+    restaurant=f('restaurant',type=str)
+    comments=f('comments',type=str)
+    fry_type=f('fryType',type=str)
+    fresh=f('isFresh',False,type=bool)
+    toppings=f('hasToppings',False,type=bool)
+    spiced=f('isSpiced',False,type=bool)
     if 1>rating>5:
         return er('Rating must be between 1 and 5.')
-    if 'n' in [fresh,toppings,spiced]:
-        return er('Fresh, Toppings, Spiced must exist')
     if fry_type not in FRY_TYPES:
         return er(f'Fry type "{fry_type}" is not valid.')
     for img in images: # initial checks
         if not img.mimetype.startswith('image/'):
             return er("All uploaded files must be images.")
-    gd:dict=maps.getPlace(restaurant) #gd==google data
+    gd=maps.getPlace(restaurant) #gd==google data
     if type(gd.get('geometry'))!=dict:
         return er(f'Place id "{restaurant}" does not exist.')
     if not comments and REVIEW_COMMENTS_REQUIRED:
@@ -158,12 +169,12 @@ def review_api():
     return {
         "status":"ok",
         "restaurant":getRestaurant(restaurant,includeRating=True),
-        "review":review_get_api(rev_id),
+        "review":review_get_api(rev_id,d2t=True),
         "user":getUser(reviewer)
     }
 
-@app.route('/getreview/<id>',methods=['GET'])
-def review_get_api(id):
+@app.route('/api/getreview/<id>',methods=['GET'])
+def review_get_api(id,d2t=False):
     review=getReview(id)
     if review:
         return {
@@ -177,14 +188,65 @@ def review_get_api(id):
             "fresh":review[6],
             "toppings":review[7],
             "spiced":review[8],
-            "reviewDate":review[9],
+            "reviewDate":dateToText(textToDatetime(review[9])) if d2t else review[9],
+            "reviewer":getUser(review[10]),
+            "relevance":review[11]
         }
     return {
         "status":"error",
         "error":"Review does not exist."
     }
 
-    
+@app.route('/api/reviews/<id>',methods=['GET'])
+def restaurant_reviews_api(id):
+    start=request.args.get('start',0,type=int)
+    if start<0:
+        start=0
+    stop=request.args.get('stop',20,type=int)
+    if stop<=start:
+        stop=start+1
+    sort=request.args.get('sort','relevance').lower()
+    if sort not in ['newest','oldest','highest','lowest','relevance']:
+        sort='relevance'
+    if getRestaurant(id):
+        order_by='REVIEW_DATE' if sort in ['newest','oldest'] else 'RATING' if sort in ['highest','lowest'] else 'RELEVANCE'
+        dir='ASC' if sort in ['oldest','lowest'] else 'DESC'
+        reviews=db.execute(f'SELECT ID FROM REVIEWS WHERE RESTAURANT=? ORDER BY {order_by} {dir} LIMIT ?',(id,stop)).fetchall()
+        start=min(start,len(reviews)-1)
+        stop=min(stop,len(reviews)-1)
+        reviews=reviews[start:]
+        return {"status":"ok","start":start,"stop":stop,"reviews":[review_get_api(review[0]) for review in reviews]}
+
+@app.route('/api/restaurant/<id>')
+def restaurant_get_api(id):
+    return getRestaurant(id,includeRating=True)
+
+@app.route('/api/restaurants')
+def all_restaurants_api():
+    # TODO: Add bounds (provided by client) `... WHERE LAT < LAT_MAX AND LAT > LAT_MIN AND LON < LON_MAX AND LON > LON_MIN`
+    rs=db.execute('SELECT ID,NAME,LAT,LON FROM RESTAURANTS').fetchall()
+    return [{
+        "id":r[0],
+        "name":r[1],
+        "lat":r[2],
+        "lon":r[3],
+    } for r in rs]
+
+@app.route('/api/search/restaurants')
+def api_restaurant_search():
+    query=request.args.get('query')
+    results=request.args.get('results',5,int)
+    sort=request.args.get('sort','default')
+    if not query:return er("You must provide a query.")
+    if results<1:return er("Results cannot be less than 1.")
+    if sort not in ['highest','lowest','most','least','default']:sort='highest'
+
+    restaurants=db.execute("SELECT ID FROM RESTAURANTS WHERE NAME LIKE '%' || ? || '%' LIMIT ?",(query,results)).fetchall()
+    restaurants=sorted([getRestaurant(restaurant[0],includeRating=True) for restaurant in restaurants],key=lambda x:x['reviews'] if sort in ['most','least'] else x['rating'] if sort in ['highest','lowest'] else x['score'],reverse=sort in ['most','highest'])
+
+    return {"status":"ok","results":restaurants}
+
+
 @app.route('/usercontent/<path:path>')
 def usercontent(path):
     return send_file(os.path.join('usercontent',path))
