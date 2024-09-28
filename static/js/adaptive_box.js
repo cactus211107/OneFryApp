@@ -102,6 +102,15 @@ function getCheckedFooter() {
 function refreshAdaptiveButtons() {
     for (const b of document.querySelectorAll('input[data-ab-name],button[data-ab-name]')) {
         b.addEventListener(b.tagName=='INPUT'?'input':'click',()=>{
+            if (b.hasAttribute('data-ab-login')) {
+                if (!window.user.loggedIn) {
+                    window._abhistory.push({direction:b.getAttribute('data-ab-dir'),box_name:b.getAttribute('data-ab-name')})
+                    moveBox('signin-page',b.getAttribute('data-ab-dir')||'right')
+                    getCheckedFooter().checked=false
+                    
+                    return
+                }
+            }
             moveBox(b.getAttribute('data-ab-name'),b.getAttribute('data-ab-dir')||'right')
         })
     }

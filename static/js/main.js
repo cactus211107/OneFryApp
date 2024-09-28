@@ -6,8 +6,8 @@ const rating_slider=document.querySelector('#rating')
 const rating_text=document.querySelector('#rating-text')
 const rating_value=document.querySelector('#rating-value')
 
-const image_upload_next=document.querySelector('#next-btn-rev-1-1')
-const options_next=document.querySelector('#next-btn-rev-2-1')
+const image_upload_next=document.querySelector('#next-btn-rev-img')
+const options_next=document.querySelector('#next-btn-rev-opts')
 
 const review_submit_btn=document.querySelector('#review')
 const review_modals=document.querySelector('.modals > .review-modals');
@@ -34,6 +34,33 @@ restaurant_nav_btn.addEventListener('click',()=>{
         }catch{}
         moveBox('search-page','left')
     }
+})
+
+const signInForm=document.querySelector('#signinForm')
+const signInUsername=document.querySelector('#signinUsername')
+const signInPw=document.querySelector('#signinPassword')
+const signInSubmit=document.querySelector('#signinSubmit')
+
+signInForm.addEventListener('submit',e=>{
+    e.preventDefault()
+    const body=new FormData()
+    body.append('username',signInUsername.value)
+    body.append('password',signInPw.value)
+    if (!signInUsername.value) {
+        invalidFormInput('signin-page',signInUsername,'Invalid Input','No username provided.',null,'left')
+        return
+    }
+    if (!signInPw.value) {
+        invalidFormInput('signin-page',signInPw,'Invalid Input','No password provided.',null,'left')
+        return
+    }
+    fetch('/api/register',{"method":"post","body":body}).then(request=>request.json()).then(result=>{
+        if (result.status=='error') {
+            invalidFormInput('signin-page',signInUsername,'Invalid Input',result.error,null,'right')
+        } else {
+            window.location.reload()
+        }
+    })
 })
 
 const search_page_results=document.querySelector('#search-page-results')
@@ -80,19 +107,21 @@ async function getRestaurant(id) {
     let data=await fetch('/api/restaurant/'+id).then(r=>r.json()).then(_=>{return _})
     return data
 }
-let review_selected_restaurant = 'ChIJN1t_tDeuEmsRUsoyG83frY4'
+let review_selected_restaurant = ''
 let selected_restaurant=''
 let restaurant_reviews_start=0;
 let restaurant_reviews_stop=20;
-function getRestauantReviews(id,start,stop,sort,callback) {
-    fetch(`/api/reviews/${id}?start=${start}&stop=${stop}&sort=${sort}`).then(response=>response.json()).then(callback)
+function getRestauantReviews(id,start,stop,sort,callback,cur_review=-1) {
+    fetch(`/api/reviews/${id}?start=${start}&stop=${stop}&sort=${sort}&current_review=${cur_review}&date=human`).then(response=>response.json()).then(callback)
 }
 function addRestaurantReviews(id,start,stop,sort,cur_review=-1) {
+    getUserReviews()
+    review_modals.innerHTML=''
+    reviews_elm.innerHTML=''
     getRestauantReviews(id,start,stop,sort,result=>{
         console.log(result)
         if (result.status!='ok')return;
         for (const review of result.reviews) {
-            if (cur_review==review.id)continue;
             addReview(reviews_elm,review)
         }
     })
@@ -273,15 +302,15 @@ review_submit_btn.addEventListener('click',e=>{                         if(!e.is
     const values=getReviewValues()
 
     if (values.rating<1||values.rating>5) { // checks
-        invalidFormInput('review-2-1',rating_slider,'Invalid Input!',"Rating not between 1 and 5",'left','bottom')
+        invalidFormInput('review-2',rating_slider,'Invalid Input!',"Rating not between 1 and 5",'left','bottom')
         return
     }
     if (values.files.length<1) {
-        invalidFormInput('review-1-1',document.querySelector('.dropzone'),'Invalid Input!',"A file must be uploaded",'left','bottom')
+        invalidFormInput('review-3',document.querySelector('.dropzone'),'Invalid Input!',"A file must be uploaded",'left','bottom')
         return
     }
     if (!fryTypes.includes(values.fry_type)) {
-        invalidFormInput('review-2-1',getFryTypeElm(),'Invalid Input!',`Invalid Fry Type "${values.fry_type}"`,'left','right')
+        invalidFormInput('review-2',getFryTypeElm(),'Invalid Input!',`Invalid Fry Type "${values.fry_type}"`,'left','right')
         return
     }
     const formData=new FormData();
@@ -300,7 +329,7 @@ review_submit_btn.addEventListener('click',e=>{                         if(!e.is
     fetch('/review',{method:"POST",body:formData}).then(response=>response.json()).then(result=>{
         console.log(result)
         if (result.status=='error') {
-            invalidFormElm(review_submit_btn,'Invalid Input!',result.error)
+            invalidFormInput('review-4',review_submit_btn,'Invalid Input!',result.error,)
         }
         if (result.status=='ok') {
             selected_restaurant=result.restaurant.id
@@ -321,8 +350,17 @@ review_submit_btn.addEventListener('click',e=>{                         if(!e.is
         }
     })
 })
-
-
+function getUserReviews(id=undefined) {
+    if (!id) {
+        id=window.user.id
+    }
+    fetch('/api/userreviews/'+id).then(r=>r.json()).then(reviews=>{
+        window.user.reviews=reviews
+    })
+}
+if (window.user.loggedIn) {
+    getUserReviews()
+}
 
 
 
@@ -357,7 +395,7 @@ var dropzone = new Dropzone(".dropzone", {
     const onchange_dropzone = () => {
         image_upload_next.disabled = !dropzone.files.length;
     };
-    // for some reason no exif exists, when it actually does
+    // HELP! for some reason no exif exists, when it actually does
     const fileChangedHandler = (file) => {
         EXIF.getData(file, function () {
             console.log('Exif',EXIF.getAllTags(this));
@@ -373,8 +411,10 @@ var dropzone = new Dropzone(".dropzone", {
     dropzone.on("addedfile", async e=>{
         onchange_dropzone()
         if (e.type=='image/heic'||e.type=='image/heif') {
+            await wait(50)
+            e.previewElement.querySelector('img').src='/static/media/loading.gif'
             let url = await convertHEIC(e)
-            dropzone.files[0].previewElement.querySelector('img').src=url
+            e.previewElement.querySelector('img').src=url
         }
     });
     dropzone.on("removedfile", onchange_dropzone);

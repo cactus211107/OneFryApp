@@ -9,10 +9,18 @@ CREATE TABLE IF NOT EXISTS REVIEWS (
     TOPPINGS INT,   -- 1:TOPPINGS;0:NOT
     SPICED INT,     -- 1:SPICED OTHER THAN SALT;0:NOT SPICED OTHER THAN SALT
     REVIEW_DATE DATETIME,
-    REVIEWER INT, -- ID
+    REVIEWER TEXT, -- ID
     RELEVANCE FLOAT, -- out of 100, higher = more relevant
-    RELEVANCE_REASON TEXT
+    RELEVANCE_REASON TEXT,
+    STATE INT
 );
+/*
+State:
+ - 0: (Unprocessed) Not yet fully processed
+ - 1: (Processed) Procesed and shown
+ - 2: (Hidden) Hidden
+ - 3: (Deleted) Deleted but shown
+*/
 CREATE TABLE IF NOT EXISTS IMAGES (
     ID INT UNIQUE,
     LAT FLOAT,
@@ -27,5 +35,13 @@ CREATE TABLE IF NOT EXISTS RESTAURANTS (
     THUMBNAIL TEXT, -- PATH
     LAT FLOAT,
     LON FLOAT
+);
+CREATE TABLE IF NOT EXISTS USERS (
+    ID TEXT UNIQUE,
+    TOKEN TEXT UNIQUE,
+    NAME TEXT UNIQUE,
+    PASSWORD VARCHAR(256),
+    LOGIN_TYPE INT, -- email, google oauth, microsoft, etc
+    JOIN_DATE DATETIME
 );
 -- rinchen

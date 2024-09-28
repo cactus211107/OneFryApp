@@ -1,7 +1,8 @@
 from flask import *
-import random,string,json,shutil,os,threading,datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+import random,string,json,shutil,os,threading,datetime,time,typing as t
 import db,maps,image,relevance
-_reset=False
+_reset=0
 if _reset:
     try:os.remove('database.db')
     except:0
@@ -10,9 +11,7 @@ if _reset:
 db.initDB('database.db')
 db.executeFile('.sql')
 
-
-
-Flask.secret_key='so, do you like fries?! Well... I do, so yeah. And btw this is the 53C3T key!!!'
+with open('session.key') as f:Flask.secret_key=f.read()
 FRY_TYPES=[
     'Regular Fries',
     'Steak Fries',
@@ -31,6 +30,7 @@ DATE_FORMAT='%d-%m-%y'
 DATETIME_FORMAT=DATE_FORMAT+'/%H:%M:%S.%f'
 
 def genid(a:int=1024,b:int=2**24,*,number:bool=True,strLenMin:int=5,strLenMax:int=16):return random.randint(a,b) if number else"".join([random.choice(string.ascii_letters+string.digits) for x in range(random.randint(strLenMin,strLenMax))])
+def xm(n,s=','):return(("?"+s)*(n-1))+"?"
 def getDate():return datetime.datetime.now().strftime(DATE_FORMAT)
 def getDatetime():return datetime.datetime.now().strftime('%d-%m-%y/%H:%M:%S.%f')
 def textToDatetime(dt):return datetime.datetime.strptime(dt,DATETIME_FORMAT)
@@ -48,12 +48,14 @@ def getRestaurant(id,*,includeRating=False):
             "lon":r[5]
         }
         if includeRating:
-            reviews=db.execute('SELECT RATING FROM REVIEWS WHERE RESTAURANT=?',(id,)).fetchall()
+            reviews=db.execute('SELECT RATING,RELEVANCE FROM REVIEWS WHERE RESTAURANT=?',(id,)).fetchall()
             s=sum([rev[0] for rev in reviews])
+            s2=sum([rev[1] for rev in reviews])
             l=len(reviews)
             rdict['reviews']=l
-            rdict['rating']=s/l if l>0 else 0
+            rdict['rating']=s/l if l>0 else 1
             rdict['score']=((rdict['rating']/2.5))**l
+            rdict['relevance']=s2/l if l>0 else 1
         return rdict
     return {}
 def getReview(id):
@@ -71,7 +73,7 @@ def _addRestaurantAuto(id,thumb,google_data):
     l=place['geometry']['location']
     lat=l['lat']
     lon=l['lng']
-    db.execute('INSERT INTO RESTAURANTS VALUES (?,?,?,?,?,?)',(id,name,address,thumb,lat,lon))
+    db.execute(f'INSERT INTO RESTAURANTS VALUES ({xm(6)})',(id,name,address,thumb,lat,lon))
 def addRestaurantAuto(id,thumb,*,google_data:dict=None):
     if google_data:_addRestaurantAuto(id,thumb,google_data)
     else:
@@ -85,7 +87,7 @@ def post(image_ids:list[str],rating:int,type:str,fresh:bool,toppings:bool,spiced
         # but if I get a server, it should be faster
         rel=relevance.getRelevancy(comments)
         db.execute('UPDATE REVIEWS SET RELEVANCE=?,RELEVANCE_REASON=? WHERE ID=?',(rel['relevance'],rel['reason'],rid))
-    db.execute(f'INSERT INTO REVIEWS VALUES ({"?,"*12}?)',(
+    db.execute(f'INSERT INTO REVIEWS VALUES ({xm(14)})',(
         review_id,
         json.dumps(image_ids),
         rating,
@@ -98,22 +100,67 @@ def post(image_ids:list[str],rating:int,type:str,fresh:bool,toppings:bool,spiced
         getDatetime(),
         reviewer_id,
         100,
-        ""
+        "",
+        0
     ))
     rel_thread=threading.Thread(target=addRelevancyThread,args=(review_id,comments))
     rel_thread.start()
     return review_id
-def getUser(id):
-    # return db.execute('SELECT * FROM UESRS WHERE ID=?',(id,))
-    return {"id":id,"name":'Jack Rushmore'} # because i dont have users yet
+def generateToken(id):
+    return f"{id}.{genid(number=False)}.{int(time.time())}"
+def createUser(name,password,loginType,id=None,token=None,join_date=None):
+    id=id or genid(number=False)
+    token=token or generateToken(id)
+    join_date=join_date or getDatetime()
+    password=generate_password_hash(password)
+    db.execute(f'INSERT INTO USERS VALUES ({xm(6)})',(id,token,name,password,loginType,join_date))
+    return id
+def getUser(id,includePassword=False,includesToken=False):
+    u=db.execute('SELECT * FROM USERS WHERE ID=? LIMIT 1',(id,)).fetchone()
+    # return {"id":id,"name":'Jack Rushmore'} # because i dont have users yet
+    return {
+        "id":u[0],
+        **({"token": u[1]} if includesToken else {}),
+        "name":u[2],
+        **({"password": u[3]} if includePassword else {}),
+        **({"loginType": u[4]} if includePassword else {}),
+        "joined":u[5],
+    }
+def setReviewState(id,state:t.Literal['unprocessed','processed','hidden','deleted']):
+    state=('unprocessed','processed','hidden','deleted').index(state)
+    db.execute('UPDATE REVIEWS SET STATE=? WHERE ID=?',(state,id))
+def deleteReview(id,justHidden=False):
+    if justHidden:
+        setReviewState(id,'deleted')
+        return
+    db.execute('DELETE FROM REVIEWS WHERE ID=?',(id,))
+def getUserFromToken(cookie_token):
+    u=db.execute('SELECT ID FROM USERS WHERE TOKEN=? LIMIT 1',(cookie_token,)).fetchone()
+    if db.isError(u):
+        return None
+    return getUser(u[0])
+def logout(session):
+    if 'token' in session:
+        session.pop('token')
+def isLoggedIn(session):
+    if 'token' in session:
+        return bool(getUserFromToken(session['token']))
+    return False
 def er(e):return{"status":"error","error":e}
 
 @app.route('/')
 def index():
-    return render_template('index.html',fry_types=FRY_TYPES,userIsAdmin=True)
+    return render_template('index.html',
+                           fry_types=FRY_TYPES,
+                           isLoggedIn=isLoggedIn(session),
+                           user=getUserFromToken(session.get('token')),
+                           userIsAdmin=True
+                           )
 
 @app.route('/review',methods=['POST'])
 def review_api():
+    if not isLoggedIn(session):
+        return er('You must be logged in to review.')
     f=request.form.get
     images=request.files.getlist('images')
     rating=f('rating',-1,type=int)
@@ -132,6 +179,8 @@ def review_api():
     for img in images: # initial checks
         if not img.mimetype.startswith('image/'):
             return er("All uploaded files must be images.")
+    if not restaurant:
+        return er('No restaurant provided.')
     gd=maps.getPlace(restaurant) #gd==google data
     if type(gd.get('geometry'))!=dict:
         return er(f'Place id "{restaurant}" does not exist.')
@@ -164,7 +213,7 @@ def review_api():
     
     if not getRestaurant(restaurant):
         addRestaurantAuto(restaurant,f'usercontent/uploads/{img_ids[0]}.webp',google_data=gd)
-    reviewer=0
+    reviewer=getUserFromToken(session.get('token'))['id']
     rev_id=post(img_ids,rating,fry_type,fresh,toppings,spiced,restaurant,comments,reviewer)
     return {
         "status":"ok",
@@ -174,7 +223,7 @@ def review_api():
     }
 
 @app.route('/api/getreview/<id>',methods=['GET'])
-def review_get_api(id,d2t=False):
+def review_get_api(id,d2t=False,includesState=False,stringState=True):
     review=getReview(id)
     if review:
         return {
@@ -190,7 +239,8 @@ def review_get_api(id,d2t=False):
             "spiced":review[8],
             "reviewDate":dateToText(textToDatetime(review[9])) if d2t else review[9],
             "reviewer":getUser(review[10]),
-            "relevance":review[11]
+            "relevance":review[11],
+            **({"state":('unprocessed','processed','hidden','deleted')[review[12]] if stringState else review[12]}if includesState else{})
         }
     return {
         "status":"error",
@@ -208,14 +258,39 @@ def restaurant_reviews_api(id):
     sort=request.args.get('sort','relevance').lower()
     if sort not in ['newest','oldest','highest','lowest','relevance']:
         sort='relevance'
+    u={}
+    if session.get('token'):
+        u=getUserFromToken(session.get('token'))
+    review_id=request.args.get('current_review',type=str)
+    human_readable_date=request.args.get('date')=='human'
+
+
     if getRestaurant(id):
         order_by='REVIEW_DATE' if sort in ['newest','oldest'] else 'RATING' if sort in ['highest','lowest'] else 'RELEVANCE'
         dir='ASC' if sort in ['oldest','lowest'] else 'DESC'
-        reviews=db.execute(f'SELECT ID FROM REVIEWS WHERE RESTAURANT=? ORDER BY {order_by} {dir} LIMIT ?',(id,stop)).fetchall()
+        reviews = db.execute(f'''
+            SELECT ID
+            FROM REVIEWS
+            WHERE RESTAURANT = ?
+            ORDER BY 
+                CASE 
+                    WHEN ID = ? THEN 1  -- Current review_id first
+                    WHEN REVIEWER = ? THEN 2  -- Reviews by the current user second
+                    ELSE 3  -- Other reviews
+                END, 
+                {order_by} {dir}
+            LIMIT ?''', (id, review_id, u.get('id','not_a_user'), stop)).fetchall()
         start=min(start,len(reviews)-1)
         stop=min(stop,len(reviews)-1)
         reviews=reviews[start:]
-        return {"status":"ok","start":start,"stop":stop,"reviews":[review_get_api(review[0]) for review in reviews]}
+        return {"status":"ok","start":start,"stop":stop,"reviews":[review_get_api(review[0],human_readable_date) for review in reviews]}
+
+@app.route('/api/userreviews/<id>')
+def api_user_reviews(id):
+    reviews=db.execute('SELECT ID FROM REVIEWS WHERE REVIEWER=?',(id,)).fetchall()
+    reviews=[getReview(r[0]) for r in reviews]
+    return reviews
+
 
 @app.route('/api/restaurant/<id>')
 def restaurant_get_api(id):
@@ -246,6 +321,28 @@ def api_restaurant_search():
 
     return {"status":"ok","results":restaurants}
 
+@app.route('/api/register',methods=['POST'])
+def api_register_user():
+    username=request.form.get('username')
+    password=request.form.get('password')
+    if not username:
+        return er('No username provided')
+    if not password:
+        return er('No password provided')
+    user=db.execute('SELECT * FROM USERS WHERE NAME=? LIMIT 1',(username,)).fetchone()
+    print(user)
+    if user: # User exists
+        if check_password_hash(user[3],password):
+            session['token']=user[1]
+            return{"status":"ok"}
+        return er('Invalid Log In Credentials')
+    id=createUser(username,password,0) # loginType=0 : Email (basic login bc no email yet)
+    user=getUser(id,includesToken=1)
+    session['token']=user['token']
+    user.pop('token')
+    return{"status":"ok","user":user}
+    
+
 
 @app.route('/usercontent/<path:path>')
 def usercontent(path):
@@ -253,11 +350,20 @@ def usercontent(path):
 
     
 
-
+@app.before_request
+def before_request():
+    if not isLoggedIn(session):
+        logout(session)
 
 @app.context_processor
 def inject_maps_api_key():return {
     'maps_key': maps.key,
+    'str':str,
+    'int':int,
+    'float':float,
+    'bool':bool,
+    'list':list,
+    'dict':dict
     }
 
 def run(*,run_on_network:bool=False,local_port:int=4096,network_port:int=80,debug:bool=False):app.run('0.0.0.0'if run_on_network else None,network_port if run_on_network else local_port,debug)

@@ -6,3 +6,5 @@ usercontent
 *.key
 .DS_Store
 *.db
+.py
+random_testing.py

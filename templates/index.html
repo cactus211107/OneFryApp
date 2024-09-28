@@ -33,28 +33,37 @@
             <div class="adaptive-box-container">
                 <div class="adaptive-boxes">
                     <div class="adaptive-box" id="home">
-                        <h1>Not Implemented Yet!</h1>
+                        <h1>I don't have a "home page" yet!</h1>
                         <p>This will be the "home page" where it will display the top reviews and restaurant of the week.</p>
+                        <p>It will be the last thing before publishing.</p>
                     </div>
-                    <div class="adaptive-box" id="review-1-1"> <!-- Upload Photo -->
-                        <h2 class="text-center">Upload a photo of the fries</h2>
-                        <div class="upload-section">
-                            <div class="dropzone">
-                                <div class="dz-default dz-message text-center">
-                                    <i class="bi bi-cloud-arrow-up" style="font-size: 2rem;"></i>
-                                    <div class="mt-3">Drop files here or click to upload.</div>
+                    <!-- Review Pages -->
+                    <div class="adaptive-box" id="review-1"> <!-- Select Restaurant -->
+                        <section>
+                            <label for="restaurant" class="form-label">
+                                <h2>Select a restaurant</h2>
+                            </label>
+                            <div class="selected-restaurant">
+                                <div class="restaurant-info d-flex flex-column">
+                                    <div id="review-restaurant-final" class="border-0 outline text-truncate">No Restaurant Selected</div>
+                                    <div id="review-restaurant-address-final" class="restaurant-address text-truncate">Fry Rd, Pennsylvania, USA</div>
+                                </div>
+                                <div class="restaurant-image d-flex align-items-center justify-content-center bg-secondary rounded-1">
+                                    <i class="bi bi-shop"></i>
+                                    <img src="" alt="" id="restaurant-image-final">
                                 </div>
                             </div>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <!-- <button type="button" class="btn btn-dark" data-ab-name="review-1-2" data-ab-dir="down">
-                                <i class="bi bi-camera"></i>
-                            </button> -->
-                            <button type="button" class="btn btn-dark" data-ab-name="review-2-1" id="next-btn-rev-1-1" disabled>Next</button>
+                            <input type="text" id="restaurant-search" class="form-control-plaintext" placeholder="Search for a restaurant...">
+                            <div id="restaurant-search-results" id="restaurant-search-results">
+                                
+                            </div>
+                        </section>
+                        <div class="ab-nav-buttons justify-content-end">
+                            <button type="button" class="btn btn-dark" data-ab-name="review-2">Next</button>
                         </div>
                     </div>
 
-                    <div class="adaptive-box" id="review-2-1"> <!-- Rating and Options -->
+                    <div class="adaptive-box" id="review-2"> <!-- Rating and Options -->
                         <section> <!-- Rating -->
                             <label for="rating" class="form-label">
                                 <h2>Rating</h2>
@@ -100,48 +109,39 @@
                             </div>
                         </section>
                         <div class="ab-nav-buttons">
-                            <button type="button" class="btn btn-dark" data-ab-name="review-1-1" data-ab-dir="left">Back</button>
-                            <button type="button" class="btn btn-dark" data-ab-name="review-3-1" id="next-btn-rev-2-1" disabled>Next</button>
+                            <button type="button" class="btn btn-dark" data-ab-name="review-1" data-ab-dir="left">Back</button>
+                            <button type="button" class="btn btn-dark" data-ab-name="review-3" id="next-btn-rev-opts" disabled>Next</button>
                         </div>
                     </div>
 
-                    <div class="adaptive-box" id="review-3-1"> <!-- Select Restaurant -->
-                        <section>
-                            <label for="restaurant" class="form-label">
-                                <h2>Select a restaurant</h2>
-                            </label>
-                            <div class="selected-restaurant">
-                                <div class="restaurant-info d-flex flex-column">
-                                    <div id="review-restaurant-final" class="border-0 outline text-truncate">No Restaurant Selected</div>
-                                    <div id="review-restaurant-address-final" class="restaurant-address text-truncate">Fry Rd, Pennsylvania, USA</div>
-                                </div>
-                                <div class="restaurant-image d-flex align-items-center justify-content-center bg-secondary rounded-1">
-                                    <i class="bi bi-shop"></i>
-                                    <img src="" alt="" id="restaurant-image-final">
+                    <div class="adaptive-box" id="review-3"> <!-- Upload Photo -->
+                        <h2 class="text-center">Upload a photo of the fries</h2>
+                        <div class="upload-section">
+                            <div class="dropzone">
+                                <div class="dz-default dz-message text-center">
+                                    <i class="bi bi-cloud-arrow-up" style="font-size: 2rem;"></i>
+                                    <div class="mt-3">Drop files here or click to upload.</div>
                                 </div>
                             </div>
-                            <input type="text" id="restaurant-search" class="form-control-plaintext" placeholder="Search for a restaurant...">
-                            <div id="restaurant-search-results" id="restaurant-search-results">
-                                
-                            </div>
-                        </section>
+                        </div>
                         <div class="ab-nav-buttons">
-                            <button type="button" class="btn btn-dark" data-ab-name="review-2-1" data-ab-dir="left">Back</button>
-                            <button type="button" class="btn btn-dark" data-ab-name="review-4-1">Next</button>
+                            <button type="button" class="btn btn-dark" data-ab-name="review-2">Back</button>
+                            <button type="button" class="btn btn-dark" data-ab-name="review-4" id="next-btn-rev-img" disabled>Next</button>
                         </div>
                     </div>
 
-                    <div class="adaptive-box" id="review-4-1"> <!-- Extra Comments -->
+                    <div class="adaptive-box" id="review-4"> <!-- Extra Comments -->
                         <h2>Comments</h2>
                         <div class="form-floating">
                             <textarea class="form-control" placeholder="Leave a comment here" id="comments" style="height: 100px"></textarea>
                             <label for="comments">Comments</label>
                         </div>
                         <div class="ab-nav-buttons">
-                            <button type="button" class="btn btn-dark" data-ab-name="review-3-1" data-ab-dir="left">Back</button>
+                            <button type="button" class="btn btn-dark" data-ab-name="review-3" data-ab-dir="left">Back</button>
                             <button type="button" class="btn btn-dark" id="review">Review</button>
                         </div>
                     </div>
+
 
                     <div class="adaptive-box" id="restaurant-page">
                         <div class="restaurant-page-thumbnail">
@@ -155,15 +155,44 @@
                         <div class="reviews"></div>
                     </div>
 
+            
                     <div class="adaptive-box" id="search-page">
                         <h2>Search</h2>
+                        <div class="searchOptions"></div>
                         <div class="restaurant-search-results" id="search-page-results">
                         
+                        </div>
+                    </div>
+
+                    <div class="adaptive-box" id="signin-page">
+                        <h1>Sign in / Sign Up</h1>
+                        <form id="signinForm">
+                            <!-- <div class="mb-3">
+                                <label for="signinEmail" class="form-label">Email address</label>
+                                <input type="text" class="form-control" id="signinEmail">
+                            </div> -->
+                            <div class="mb-3">
+                                <label for="signinUsername" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="signinUsername">
+                            </div>
+                            <div class="mb-3">
+                                <label for="signinPassword" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="signinPassword">
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="signinSubmit">Submit</button>
+                            <span></span>
+                        </form>
+                    </div>
+                    <div class="adaptive-box" id="profile-page">
+                        <h2 class="profile-name">{{ user['name'] }}'s Profile</h2>
+                        <div class="profile-reviews">
+
                         </div>
                     </div>
                 </div>
             </div>
             <div class="main-window-footer">
+                <div class="footer-line"></div>
                 <div class="btn-group">
                     <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn1" autocomplete="off" data-ab-name="home" data-ab-dir="left" checked>
                     <label class="btn" for="radio-btn1">
@@ -171,7 +200,7 @@
                         <span class="btn-small-text">Home</span>
                     </label>
 
-                    <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn2" data-ab-name="review-1-1" autocomplete="off">
+                    <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn2" data-ab-name="review-1" data-ab-login autocomplete="off">
                     <label class="btn" for="radio-btn2">
                         <i class="bi bi-pencil-square"></i>
                         <span class="btn-small-text">Review</span>
@@ -188,11 +217,19 @@
                         <i class="bi bi-shop"></i>
                         <span class="btn-small-text">Restaurant</span>
                     </label>
-                    <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn5" data-ab-name="home" data-ab-dir="down" autocomplete="off">
-                    <label class="btn" for="radio-btn5">
-                        <i class="bi bi-person-circle"></i>
-                        <span class="btn-small-text">Profile</span>
-                    </label>
+                    {% if isLoggedIn %}
+                        <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn5" data-ab-name="profile" autocomplete="off">
+                        <label class="btn" for="radio-btn5">
+                            <i class="bi bi-person-circle"></i>
+                            <span class="btn-small-text">Profile</span>
+                        </label>
+                    {% else %}
+                        <input type="radio" class="btn-check" name="vbtn-radio" id="radio-btn5" data-ab-name="signin-page" data-ab-dir="down" autocomplete="off">
+                        <label class="btn" for="radio-btn5">
+                            <i class="bi bi-person-circle"></i>
+                            <span class="btn-small-text">Sign In</span>
+                        </label>
+                    {% endif %}
                     {% if userIsAdmin %}
                         <input type="radio" class="btn-check" name="vbtn-radio" id="admin-btn-bottom-nav" autocomplete="off" onclick="window.open('/ui/admin','_blank')">
                         <label class="btn" for="admin-btn-bottom-nav">
@@ -209,6 +246,8 @@
     </div>
     <script>
         window.fryTypes={{ fry_types|safe }};
+        window.user={{ (user or {})|safe }};
+        window.user.loggedIn={{ str(isLoggedIn).lower()|safe }};
         // Initialize and add the map
         let map;
 

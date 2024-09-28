@@ -104,22 +104,6 @@ html,body,.windows {
     padding: 13px 26px;
     border-radius: 3px;
 }
-/* for testing */
-/* #home {
-    background-color: var(--bs-red);
-}
-#review-1-1 {
-    background-color: var(--bs-pink);
-}
-#review-1-2 {
-    background-color: var(--bs-blue);
-}
-#review-2-1 {
-    background-color: var(--bs-green);
-}
-#review-3-1 {
-    background-color: var(--bs-yellow);
-} */
 
 .main-window-footer .btn {
     display: flex;
@@ -240,7 +224,7 @@ label.btn {
     --bs-popover-bg:var(--bs-warning)
 }
 #restaurant-name {
-    margin-bottom: 2px;
+    margin-bottom: -8px;
     font-size: 1.7rem;
 }
 .star {
@@ -252,6 +236,7 @@ label.btn {
     align-items: center;
     gap: 2px;
     color: #2c75f4;
+    margin-top: 3px;
 }
 
 
@@ -297,4 +282,11 @@ label.btn {
     padding: 6px 9px 4px;
     width: 300px;
     font-size: 14px;
+}
+.footer-line {
+    position: absolute;
+    width: var(--main-window-width);
+    height: 2px;
+    background: #dddddd;
+    transform: translate(-10px, -10px);
 }

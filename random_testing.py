@@ -1,4 +1,2 @@
-import datetime
-
-
-print(datetime.datetime.now().strftime('%d-%m-%y / %H:%M:%S.%f'))
+x=[0]
+print(bool(x))

@@ -20,6 +20,13 @@ class DBOBJECT:
 class DBERROR:
     def __init__(self,e) -> None:
         self.error=e
+    # maybe add these
+    # def fetchone(self):
+    #     return self
+    # def fetchall(self):
+    #     return self
+    # def fetchmany(self,s):
+    #     return self
 
 def execute(sql:str,params:tuple|None = None)->DBOBJECT:
     global _db
@@ -49,5 +56,4 @@ def executeFile(path:str|PathLike):
             except sqlite3.Error as e:
                 print(f"Error executing statement: {statement}")
                 raise e
-def parseResponseAsJSON(response:str)->dict|list|tuple:
-    return json.loads(response.replace('(','[').replace(')',']').replace("'",'"'))
+def isError(o):return o is DBERROR or not o
